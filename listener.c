@@ -20,7 +20,10 @@
 #include "global.h"
 #include "mutthread.h"
 
-int sock_array[backlog];
+#define QUEUE_LENGTH	1023
+int client_socket[QUEUE_LENGTH];
+int connections = 0;
+
 void create_listener()
 {
 /*
@@ -44,42 +47,80 @@ void create_listener()
 		int clientSock;
 		int client_len = sizeof(client);
 
-	    int ret;
-		int sock, new_sock;
+		int sock, new_sock, maxsock;
 	    fd_set readfds;
 	    FD_ZERO(&readfds);
-		sock = ip_sock;
+		maxsock = ip_sock;
 	    FD_SET(ip_sock, &readfds);
+	
+		int ret, i;
+		for(i = 0; i < QUEUE_LENGTH; i++)
+		{
+			if(client_socket[i] != 0)
+			{
+				FD_SET(client_socket[i], &readfds);
+			}
+		}
 
-	    while(1)
-	    { 
-/*
-			ret = select(sock + 1, &readfds, 0, 0, 0);
-	        if(ret == -1) 
+		while(1)
+		{
+			ret = select(maxsock + 1, &readfds, 0, 0, 0);
+	        if(ret < 0) 
 	        { 
 	        	perror("select()");
 				break;
 	        } 
-	        if(ret > 0)
-	        { 
-				if(!FD_ISSET(sock, &readfds))
+
+			for(i = 0; i < QUEUE_LENGTH; i++)
+			{
+				if(FD_ISSET(client_socket[i], &readfds))
 				{
-					printf("sock %d can't reads.\n", sock);
-					continue;
+#ifdef debug
+					printf("client[%d]\n", i);
+#endif
+					create_thread(client_socket[i]);
 				}
-*/
-				if((new_sock = accept(sock, (struct sockaddr *)&client,
-							(socklen_t *)&client_len)) == -1)
+			}
+
+			if(FD_ISSET(ip_sock, &readfds))
+			{
+				if((new_sock = accept(ip_sock, (struct sockaddr *)&client,
+										(socklen_t *)&client_len)) <= 0)
 				{
 					perror("accept()");
+					continue;
+				}
+
+				if(connections < QUEUE_LENGTH)
+				{
+					client_socket[connections++] = new_sock;
+#ifdef debug
+					printf("New client_socket[%d] %s:%d, new sock is %d.\n",
+										connections, inet_ntoa(client.sin_addr), 
+										ntohs(client.sin_port), new_sock);
+#endif
+				}
+				
+				if(new_sock > maxsock)
+				{
+					maxsock = new_sock;
+				}
+				else
+				{
+					send(new_sock, "Too many connections.", sizeof("Too many connections"), 0);	
+					close(new_sock);
 					break;
 				}
-#ifdef debug
-				printf("Start new event!\naccept sock is %d.\nCreate new thread.\n", new_sock);
-#endif
-				create_thread(new_sock);
-//			} 
-        } 
+			}
+		}
+
+		for(i = 0; i < QUEUE_LENGTH; i++)
+		{
+			if(client_socket[i] != 0)
+			{
+				close(client_socket[i]);
+			}
+		}
 	}
     return ;
 }

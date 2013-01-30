@@ -11,7 +11,11 @@ all:$(objects)
 lex.yy.o:lex.yy.c
 lex.yy.c:parse.yy
 	flex   parse.yy
+redis.o:redis.c redis.h libredis.h
+	cc -c -o redis.o redis.c $(depend)
+
 .PHONY:clean
+
 clean:
 	rm -f $(objects) $(bin)
 	rm -f lex.yy.c
