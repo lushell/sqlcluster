@@ -1,4 +1,5 @@
-/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. All rights reserved.
+/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. 
+						All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,38 +23,33 @@
 
 void *do_create_thread(void *agc)
 {
-	packet *net;
-	net = malloc(sizeof(net));
-	memset(net, 0, sizeof(net));
-	net  = (packet *)agc;
+	int sockfd  = *((int *)agc);
 #ifdef debug
-	printf("do_create_thread() net->fd=%d\n", net->fd);
+	printf("sockfd = %d, agc = %d\n", sockfd, *(int *)agc);
 #endif
-	if(proc_main(net))
+	if(proc_main(sockfd))
 	{
 		printf("proc_main(): excute unsuccessful.\n");
 	}
-//	free(net);
 	pthread_exit(NULL);
 }
 
-int thread_incr = 0;
+int thread_incr = -1;
 void create_thread(int fd_sock)
 {
-	packet s_net;
-	s_net.fd = fd_sock;
-    pthread_t pt[max_connections + 1];
+    pthread_t pt[1023];
 	int res;
-    printf("thread is %d\n",	thread_incr++);
-    res = pthread_create(&pt[thread_incr], NULL, do_create_thread, (void *)&s_net);
+	thread_incr++;
+	int fd = fd_sock;
+    res = pthread_create(&pt[thread_incr], NULL, 
+							do_create_thread, &fd);
     if(res)
     { 
         printf("Create thread failed\n");
 		exit(-1);
     }
 #ifdef debug
-	printf("Create thread success.\n");
+	printf("Create thread[%d] success.\n", thread_incr);
 #endif
-	pthread_join(pt[thread_incr], NULL);
 	return ;
 }

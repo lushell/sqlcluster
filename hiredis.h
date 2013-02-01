@@ -4,3 +4,6 @@ void sequence_incr(char *s);
 unsigned long long int
 sequence_reset(char *s, 
 			unsigned long long int reset_value);
+void 
+mini_storage(char *key, 
+            char *value);

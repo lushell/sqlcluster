@@ -27,18 +27,20 @@ pthread_t mutex;
 int init_kernel()
 {
 	pthread_mutex_init(&mutex, NULL);
+	create_redis_connect();			/* Redis storage server */
 	return 0;
 }
 
 void close_server()
 { 
 	pthread_mutex_destroy(&mutex);
+	close_redis_connect();
 }
 
 int main(int argc, char *argv[])
 {
-	init_kernel();
 	open_listen_port();
+	init_kernel();
 	create_listener();
 	close_server();
 	return 0;

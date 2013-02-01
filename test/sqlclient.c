@@ -31,8 +31,9 @@ void my_help()
 
 void welcome()
 {
-	printf("Welcome to sqlcluster! shell@Copyleft.\n"
-		"Author, tangchao@360buy.com.\n");
+	printf("Welcome to sqlcluster, shell@Copyleft.\n"
+		"Author, tangchao@360buy.com.\n"
+		"-----------------------------------------\n");
 	
 }
 
@@ -106,8 +107,8 @@ int main(int argc, char *argv[])
 	ssize_t send_length;
 	int buffer_size;
 
-        fd_set writefds;
-       	FD_ZERO(&writefds);
+    fd_set writefds;
+    FD_ZERO(&writefds);
 	FD_SET(sock, &writefds);
 	int ret;
 
@@ -123,7 +124,7 @@ int main(int argc, char *argv[])
 
 		if(strcmp(buffer, "quit") == 0) 
 		{
-			while(close(sock));
+			close(sock);
 			return 0;
 		}
 		if(strcmp(buffer, "help") == 0)
@@ -133,7 +134,7 @@ int main(int argc, char *argv[])
 		}
 		printf("buffer is %s, size is %d\n", buffer, buffer_size - 1);
 
-        ret = select(sock + 1, &writefds, &writefds, NULL, &timeout);
+        ret = select(sock + 1, NULL, &writefds, NULL, &timeout);
 		if(ret == -1)
 		{
 			perror("select()");
@@ -144,7 +145,7 @@ int main(int argc, char *argv[])
 			send_length = send(sock, buffer, 
 						(size_t)strlen(buffer), 0);
 #ifdef debug
-			perror("send()");
+//			perror("send()");
 			printf("send data size %d byte.\n", 
 						send_length);
 #endif

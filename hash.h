@@ -13,9 +13,4 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., Beijing China - 2013.1.24 */
 
-#include <stdio.h>
-
-#define debugprint(S, V)	printf(S, V);
-int debugprint(char *s, char *v)
-{
-}
+unsigned int simple_hash(void *src);

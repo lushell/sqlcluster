@@ -19,16 +19,17 @@ typedef struct _command
 {
 	char str[net_length];
 	int command;
+	int cmd_sum;
 } command;
 
 typedef struct _packet
 {
 	int	fd;
-	command *net;
+	char net[net_length];
 	int net_error;
 } packet;
 
-
+/* Connection redis server */
 #define redis_addr  "172.17.4.49"
 #define redis_port  6379
 #define redis_auth  "hello,kitty"

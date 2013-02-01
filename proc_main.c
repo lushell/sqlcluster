@@ -16,43 +16,32 @@
 #include "global.h"
 #include "parse.h"
 
-int proc_main(packet *net)
+int proc_main(int net)
 {
-	packet *pkt = net;
-    pkt->net = malloc(sizeof(char) * net_length);
+	packet pkt;
+	pkt.fd = net;
 	for(;;)
 	{
-		memset(pkt->net, 0, net_length);
-		pkt->net_error = read(pkt->fd, pkt->net, net_length);
-    	if(pkt->net_error > 0) // && errno != ESPIPE)	/* ESPIPE 29, wait fix */
+		memset(pkt.net, 0, net_length);
+		pkt.net_error = read(pkt.fd, pkt.net, net_length);
+    	if(pkt.net_error > 0) 
 		{
 #ifdef debug
 			printf("Net length = %d, sockfd = %d, buffer = %s\n", 
-										pkt->net_error, pkt->fd, pkt->net);
+									pkt.net_error, pkt.fd, pkt.net);
 #endif
-			if(command_parse(pkt))
+			if(command_parse(&pkt))
 			{			/* Parse command */
 				return -1;
 			}
 		}
-/* Eerror */
-/*
-#ifdef debug
-		else if(pkt->net_error == -1)
-		{
-			perror("read()");
-			printf("Net error, errno is %d.\n", errno);  
-		}
-#endif
-*/
-/* By peer */
-		else if(pkt->net_error == 0)
+		else if(pkt.net_error == 0)
 		{
 #ifdef debug
-			printf("Connection closed.\n");
+			printf("close socket fd %d\n", pkt.fd);
 #endif
-			return close(pkt->fd);		/* Close current connection */
+			close(pkt.fd);
 		}
 	}
-	return close(pkt->fd);
+	return 0;
 }

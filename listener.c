@@ -15,6 +15,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <fcntl.h>
 #include "global.h"
@@ -22,7 +23,7 @@
 
 #define QUEUE_LENGTH	1023
 int client_socket[QUEUE_LENGTH];
-int connections = 0;
+int connections = -1;
 
 void create_listener()
 {
@@ -40,7 +41,8 @@ void create_listener()
 				"process id is %d.\n", listener_pid_t);
 	}
 */
-	int listener_pid_t = 0;
+	pid_t listener_pid_t = 0;
+	int ret, i;
 	if(listener_pid_t == 0)
 	{
 		struct sockaddr_in client;
@@ -48,15 +50,14 @@ void create_listener()
 		int client_len = sizeof(client);
 
 		int sock, new_sock, maxsock;
+		maxsock = ip_sock;
+/* Init fd set */
 	    fd_set readfds;
 	    FD_ZERO(&readfds);
-		maxsock = ip_sock;
 	    FD_SET(ip_sock, &readfds);
-	
-		int ret, i;
 		for(i = 0; i < QUEUE_LENGTH; i++)
 		{
-			if(client_socket[i] != 0)
+			if(FD_ISSET(client_socket[i], &readfds))
 			{
 				FD_SET(client_socket[i], &readfds);
 			}
@@ -70,18 +71,6 @@ void create_listener()
 	        	perror("select()");
 				break;
 	        } 
-
-			for(i = 0; i < QUEUE_LENGTH; i++)
-			{
-				if(FD_ISSET(client_socket[i], &readfds))
-				{
-#ifdef debug
-					printf("client[%d]\n", i);
-#endif
-					create_thread(client_socket[i]);
-				}
-			}
-
 			if(FD_ISSET(ip_sock, &readfds))
 			{
 				if((new_sock = accept(ip_sock, (struct sockaddr *)&client,
@@ -90,30 +79,29 @@ void create_listener()
 					perror("accept()");
 					continue;
 				}
-
 				if(connections < QUEUE_LENGTH)
 				{
-					client_socket[connections++] = new_sock;
+					connections++;
+					client_socket[connections] = new_sock;
 #ifdef debug
-					printf("New client_socket[%d] %s:%d, new sock is %d.\n",
-										connections, inet_ntoa(client.sin_addr), 
-										ntohs(client.sin_port), new_sock);
+					printf("New client_socket[%d]=%d %s:%d, new_sock = %d.\n", connections, 
+												client_socket[connections], 
+												inet_ntoa(client.sin_addr), 
+												ntohs(client.sin_port), new_sock);
 #endif
 				}
-				
 				if(new_sock > maxsock)
 				{
 					maxsock = new_sock;
+					create_thread(client_socket[connections]);
 				}
 				else
 				{
-					send(new_sock, "Too many connections.", sizeof("Too many connections"), 0);	
 					close(new_sock);
-					break;
 				}
 			}
 		}
-
+/* Close fd */
 		for(i = 0; i < QUEUE_LENGTH; i++)
 		{
 			if(client_socket[i] != 0)

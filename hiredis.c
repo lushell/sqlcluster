@@ -75,8 +75,8 @@ sequence_incr(char *s)
 Call ok, Return value == reset_value */
 unsigned long long int 
 sequence_reset(
-				char *s, 
-				unsigned long long int reset_value) 
+		char *s, 
+		unsigned long long int reset_value) 
 {
 	char buffer[63];
 	sprintf(buffer, "set %s %lld", s, reset_value);

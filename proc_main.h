@@ -1,1 +1,1 @@
-int proc_main(packet *net);
+int proc_main(int net);
