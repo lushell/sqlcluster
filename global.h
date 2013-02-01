@@ -30,6 +30,6 @@ typedef struct _packet
 } packet;
 
 /* Connection redis server */
-#define redis_addr  "172.17.4.49"
+#define redis_addr  "127.0.0.1"
 #define redis_port  6379
-#define redis_auth  "hello,kitty"
+//#define redis_auth 

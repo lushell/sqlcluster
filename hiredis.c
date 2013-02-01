@@ -30,9 +30,8 @@ create_redis_connect()
 		printf("Redis connect ok.\n");
 	}
 #endif
-#ifndef redis_auth
-#define redis_auth
-#endif
+
+#ifdef redis_auth
 	if(redis_auth == NULL)
 	{
 #ifdef debug
@@ -49,6 +48,8 @@ create_redis_connect()
 		return -1;
     }   
     freeReplyObject(reply);
+#endif
+
 	return 0;
 }
 

@@ -26,6 +26,6 @@ int command_parse(packet *command_packet)
 	printf("cmd.str = %s\n", cmd.str);
 #endif
 //	return sql_parse(&cmd);
-	mini_storage(key, value)
-	
+//	mini_storage(key, value)
+	return 0;	
 }
