@@ -291,15 +291,12 @@ static void yy_fatal_error YY_PROTO(( yyconst char msg[] ));
 	*yy_cp = '\0'; \
 	yy_c_buf_p = yy_cp;
 
-#define YY_NUM_RULES 11
-#define YY_END_OF_BUFFER 12
-static yyconst short int yy_accept[45] =
+#define YY_NUM_RULES 7
+#define YY_END_OF_BUFFER 8
+static yyconst short int yy_accept[18] =
     {   0,
-        0,    0,   12,   10,    9,    7,    8,    1,    6,    6,
-        6,    5,    5,    5,    5,    5,    5,    2,    1,    6,
-        5,    5,    5,    5,    5,    5,    2,    5,    5,    5,
-        5,    5,    5,    5,    4,    5,    5,    5,    5,    5,
-        5,    5,    3,    0
+        5,    5,    8,    6,    7,    1,    5,    1,    5,    2,
+        2,    3,    4,    3,    5,    5,    0
     } ;
 
 static yyconst int yy_ec[256] =
@@ -307,17 +304,17 @@ static yyconst int yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    3,
-        4,    1,    1,    1,    1,    5,    1,    6,    6,    6,
-        6,    6,    6,    6,    6,    6,    6,    1,    1,    7,
-        8,    9,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,   10,   11,   12,   13,
+        1,    1,    1,    3,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    4,    4,    4,
+        4,    4,    4,    4,    4,    4,    4,    1,    5,    1,
+        1,    1,    1,    1,    6,    6,    6,    6,    6,    6,
+        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
+        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
+        1,    1,    1,    1,    1,    1,    6,    6,    7,    6,
 
-       14,   15,   11,   11,   16,   11,   11,   17,   18,   19,
-       20,   21,   11,   22,   23,   24,   25,   11,   11,   11,
-       11,   11,    1,    1,    1,    1,    1,    1,    1,    1,
+        8,    9,    6,   10,    6,    6,    6,    7,    9,    6,
+        9,    6,    6,   11,    7,    7,    6,    6,   10,    6,
+        6,    6,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -334,55 +331,38 @@ static yyconst int yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst int yy_meta[26] =
+static yyconst int yy_meta[12] =
     {   0,
-        1,    1,    1,    1,    1,    2,    1,    1,    1,    2,
-        2,    2,    2,    2,    2,    2,    2,    2,    2,    2,
-        2,    2,    2,    2,    2
+        1,    1,    1,    2,    1,    2,    2,    2,    2,    2,
+        2
     } ;
 
-static yyconst short int yy_base[46] =
+static yyconst short int yy_base[19] =
     {   0,
-        0,    0,   60,   61,   61,   61,   61,   21,   51,   61,
-       50,    0,   43,   34,   36,   40,   32,   46,   23,   61,
-        0,   34,   30,    7,   32,   35,   41,   32,   27,   30,
-       23,   28,   31,   16,    0,   17,   26,   13,   22,   11,
-       10,   19,    0,   61,   30
+        0,    0,   22,   23,   23,   23,   17,   23,   16,   15,
+       14,   13,   12,   11,   10,    9,   23,   10
     } ;
 
-static yyconst short int yy_def[46] =
+static yyconst short int yy_def[19] =
     {   0,
-       44,    1,   44,   44,   44,   44,   44,   44,   44,   44,
-       44,   45,   45,   45,   45,   45,   45,   44,   44,   44,
-       45,   45,   45,   45,   45,   45,   44,   45,   45,   45,
-       45,   45,   45,   45,   45,   45,   45,   45,   45,   45,
-       45,   45,   45,    0,   44
+       17,    1,   17,   17,   17,   17,   18,   17,   18,   18,
+       18,   18,   18,   18,   18,   18,    0,   17
     } ;
 
-static yyconst short int yy_nxt[87] =
+static yyconst short int yy_nxt[35] =
     {   0,
-        4,    5,    6,    7,    4,    8,    9,   10,   11,   12,
-       12,   12,   13,   12,   14,   15,   12,   12,   12,   12,
-       12,   12,   16,   12,   17,   18,   19,   18,   19,   30,
-       31,   21,   43,   43,   43,   43,   42,   41,   40,   39,
-       38,   37,   35,   36,   35,   34,   27,   33,   32,   29,
-       28,   27,   26,   25,   24,   23,   22,   20,   20,   44,
-        3,   44,   44,   44,   44,   44,   44,   44,   44,   44,
-       44,   44,   44,   44,   44,   44,   44,   44,   44,   44,
-       44,   44,   44,   44,   44,   44
+        4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
+       14,   16,   17,   15,   17,   17,   17,   17,   17,   17,
+       15,   17,    3,   17,   17,   17,   17,   17,   17,   17,
+       17,   17,   17,   17
     } ;
 
-static yyconst short int yy_chk[87] =
+static yyconst short int yy_chk[35] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    8,    8,   19,   19,   24,
-       24,   45,   42,   41,   40,   39,   38,   37,   36,   34,
-       33,   32,   31,   30,   29,   28,   27,   26,   25,   23,
-       22,   18,   17,   16,   15,   14,   13,   11,    9,    3,
-       44,   44,   44,   44,   44,   44,   44,   44,   44,   44,
-       44,   44,   44,   44,   44,   44,   44,   44,   44,   44,
-       44,   44,   44,   44,   44,   44
+        1,   18,   16,   15,   14,   13,   12,   11,   10,    9,
+        7,    3,   17,   17,   17,   17,   17,   17,   17,   17,
+       17,   17,   17,   17
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -399,17 +379,12 @@ char *yytext;
 #line 1 "parse.yy"
 #define INITIAL 0
 #line 2 "parse.yy"
-#include <math.h>
+#include <stdio.h>
 #include <string.h>
-int key_flag = 0;
-int table_flag = 0;
-int insert_flag = 0;
-int insert_field_order = 0;//记录insert语句中主键所在列的位置
-int insert_value_order = 0;
-int insert_tmp = 0;
-char *id="id";
-char *last_text;
-#line 413 "lex.yy.c"
+#include <math.h>
+int sqlnum=0;
+char *sql_type;
+#line 388 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -560,9 +535,9 @@ YY_DECL
 	register char *yy_cp = NULL, *yy_bp = NULL;
 	register int yy_act;
 
-#line 15 "parse.yy"
+#line 9 "parse.yy"
 
-#line 566 "lex.yy.c"
+#line 541 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -613,13 +588,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 45 )
+				if ( yy_current_state >= 18 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 61 );
+		while ( yy_base[yy_current_state] != 23 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -647,147 +622,40 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 16 "parse.yy"
-{//输出整形数字
-				if(key_flag == 2)//select，delete，update输出的主键的值
-                                {   
-                                        printf(" %d\n", atoi( yytext )); 
-                                }   
-                                if(insert_flag >=4 && (insert_flag % 2 == 0)) 
-                                {   
-                                        if(insert_value_order == insert_field_order)
-                                        {   
-                                                printf("insert primary key value:%d\n",atoi(yytext));
-                                        }   
-                                        insert_value_order ++; 
-                                }   
-                 }   
+#line 10 "parse.yy"
+sqlnum++;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 30 "parse.yy"
-{//输出浮点型
-                                if(key_flag == 2)
-                                {   
-                                        printf(" %g\n", atof( yytext ));
-                                }
-                       }
+#line 11 "parse.yy"
+sql_type = yytext;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 37 "parse.yy"
-{//碰到这几个关键字就输出
-                                last_text=strdup(yytext);
-                                if(strcmp(yytext, "insert") == 0)
-                                {
-                                        insert_flag = 1;
-                                }
-                                printf( "your sql command is %s\n", yytext );
-                                }
+#line 12 "parse.yy"
+printf("%s\n", yytext);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 45 "parse.yy"
-{
-                                last_text=strdup(yytext);
-                       }
+#line 13 "parse.yy"
+printf("%s\n", yytext);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 48 "parse.yy"
-{
-                                if(!strcmp(last_text, "from")//输出表名
-                                         ||!strcmp(last_text, "into") ||!strcmp(last_text, "update") )
-                                {
-                                        printf( "table name is %s\n", yytext );
-                                }
-                                last_text=strdup(yytext);//记录本次记录
-                                if(strcmp(yytext,id)==0)
-                                {
-                                        key_flag = 1;//key_flag为1的时候，输出主键的操作符，是2的时候表示输出键值
-                                        printf("the primary key is %s\n",yytext);
-                                }
-                                if(key_flag == 2)
-                                {
-                                        printf(" %s\n",  yytext );
-                                }
-                                if((insert_flag == 2) && (insert_tmp == 0))
-                                {
-                                        if(strcmp(yytext, id) == 0)
-                                        {
-                                                insert_tmp = 1;
-                                        }
-                                        else
-                                        {
-                                                insert_field_order ++;
-                                        }
-                                }
-                      }
+#line 14 "parse.yy"
+printf("%s\n", yytext);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 77 "parse.yy"
-{
-                                if((key_flag == 1)&&(strcmp(last_text, id)==0))
-                                {
-                                        key_flag = 2;
-                                        last_text=strdup(yytext);
-                                        printf( "<key-opt-value>: %s ", id );
-                                        printf( " %s ", yytext );//碰到操作符输出
-                                }
-                                //else if(key_flag == 1)printf( "error input: %s\n", yytext );
-                        }
+#line 15 "parse.yy"
+
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 87 "parse.yy"
-{//当insert语句遇到第一个"("，表示后面紧跟着的是field，insert_flag 值为2，第二次碰到就是values了
-                                if(insert_flag == 1)
-                                {
-                                        insert_flag = 2;
-                                }
-                                else if(insert_flag >=3 && (insert_flag % 2 ==1))
-                                {
-                                        insert_flag ++;
-                                }
-                        }
-	YY_BREAK
-case 8:
-YY_RULE_SETUP
-#line 97 "parse.yy"
-{//第一次碰到insert_flag 值为3，表示field的结束。
-                                if(insert_flag == 2)
-                                {
-                                        insert_flag = 3;
-                                }
-                                else if(insert_flag >=4 && (insert_flag % 2 == 0))
-                                {
-                                        insert_flag ++;
-                                }
-                        }
-	YY_BREAK
-case 9:
-YY_RULE_SETUP
-#line 107 "parse.yy"
-{
-                                key_flag = 0;
-                                insert_flag = 0;
-                                insert_field_order = 0;
-                                insert_value_order = 0;
-                                insert_tmp = 0;
-                        }
-	YY_BREAK
-case 10:
-YY_RULE_SETUP
-#line 114 "parse.yy"
-//     printf( "Unrecognized character: %s\n", yytext );//最后是不能辨认的字符
-	YY_BREAK
-case 11:
-YY_RULE_SETUP
-#line 115 "parse.yy"
+#line 16 "parse.yy"
 ECHO;
 	YY_BREAK
-#line 791 "lex.yy.c"
+#line 659 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1079,7 +947,7 @@ static yy_state_type yy_get_previous_state()
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 45 )
+			if ( yy_current_state >= 18 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1114,11 +982,11 @@ yy_state_type yy_current_state;
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 45 )
+		if ( yy_current_state >= 18 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 44);
+	yy_is_jam = (yy_current_state == 17);
 
 	return yy_is_jam ? 0 : yy_current_state;
 	}
@@ -1669,21 +1537,17 @@ int main()
 	return 0;
 	}
 #endif
-#line 115 "parse.yy"
+#line 16 "parse.yy"
 
- 
-        int    sql_parse(int argc, char *argv[])
-        {
-                ++argv, --argc;//循环输入
-               if ( argc > 0 )
-                       yyin = fopen( argv[0], "r" );
-               else
-                       yyin = stdin;
- 
-                   yylex();
-        }
-        yywrap()//仅表示程序结束
-        {
-                return 0;
-        }
 
+int main(void)
+{
+	yylex();
+	printf("sql type is %s, sql sum is %d\n", sql_type, sqlnum);
+	return 0;
+}	
+
+int yywrap()
+{
+	return 1;
+}
