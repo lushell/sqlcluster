@@ -1,5 +1,4 @@
-/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. 
-   All rights reserved.
+/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,22 +14,34 @@
    Foundation, Inc., Beijing China - 2013.1.24 */
 
 #include "global.h"
-#include "hash.h"
-#include "hiredis.h"
-#include "lex.h"
+#include <stdlib.h>
+#include <unistd.h>
 
-int command_parse(packet *command_packet)
+table *create_new_table(tbdef *create_str)
 {
-	command cmd;
-	memcpy(cmd.str, command_packet->net, net_length);
-#ifdef debug
-	printf("cmd.str = %s\n", cmd.str);
-#endif
-	sql_parse(&cmd);
-/*
-	unsigned int key = simple_hash(cmd.str);
-	printf("key = %u\n", key);
-	mini_storage(key, command_packet->net);
-*/
-	return 0;
+	table *new_table, *next_link, *head;
+	tbdef *str = (tbdef *)create_str;
+	if(str[0] == NULL)
+	{
+		printf("Create table failed.\n");
+		exit(1);
+	}
+	if(head = (table *)malloc(sizeof(table)) == NULL)
+	{
+		perror("malloc");
+		break;
+	}
+	head->link = NULL;
+	head->def = NULL;
+	int i;
+	for(i = 0; i < max_column; i++)
+	{
+		if(str[i] == NULL)
+		{
+			break;
+		}
+/* Store definitions */
+		
+	}
+	return new_table;
 }

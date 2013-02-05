@@ -22,18 +22,18 @@
 /* Global */
 
 /* Thread mutex , cond */
-pthread_t mutex;
+pthread_mutex_t connections_mutex;
 
 int init_kernel()
 {
-	pthread_mutex_init(&mutex, NULL);
+	pthread_mutex_init(&connections_mutex, NULL);
 	create_redis_connect();			/* Redis storage server */
 	return 0;
 }
 
 void close_server()
 { 
-	pthread_mutex_destroy(&mutex);
+	pthread_mutex_destroy(&connections_mutex);
 	close_redis_connect();
 }
 

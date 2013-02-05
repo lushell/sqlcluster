@@ -1,2 +1,0 @@
-select * from table where id = 123;
-select id,name from shell where gg = 1;

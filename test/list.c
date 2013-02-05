@@ -11,37 +11,37 @@ typedef struct _node
 
 node * create(int n)
 {
-	node *p, *h, *s; /* h head, p prev, s current */
+	node *prev, *next, *head, *data;
 	int i;
-	if((h = (node *)malloc(sizeof(node))) == NULL)
+	if((head = (node *)malloc(sizeof(node))) == NULL)
 	{
 		perror("malloc");
 		exit(1);
 	}
-	h->name[0] = '\0';
-	h->link = NULL;
-	p = h;
+	head->name[0] = '\0';
+	head->link = NULL;
+	prev = head;
 	for(i = 0; i < n; i++)
 	{
-		if((s = (node *)malloc(sizeof(node))) == NULL)
+		if((data = (node *)malloc(sizeof(node))) == NULL)
 		{
 			perror("malloc");
 			exit(1);
 		}
-		p->link = s;
+		prev->link = data;
 		printf("Please %sth's name\n", i + 1);
-		scanf("%s", s->name);
-		s->link = NULL;
-		p = s;
+		scanf("%s", data->name);
+		data->link = NULL;
+		prev = data;
 	}
-	return h;
+	return head;
 }
 
 int main(void)
 {
 	int number;
-	node *head;
 	number = 10;
-	head = create(number);
+	node *stu;
+	stu = create(number);
 	return 0;
 }

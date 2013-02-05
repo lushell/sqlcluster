@@ -5,5 +5,5 @@ unsigned long long int
 sequence_reset(char *s, 
 			unsigned long long int reset_value);
 void 
-mini_storage(char *key, 
+mini_storage(unsigned int key, 
             char *value);

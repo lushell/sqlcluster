@@ -33,3 +33,18 @@ typedef struct _packet
 #define redis_addr  "127.0.0.1"
 #define redis_port  6379
 //#define redis_auth 
+
+/* Table structure definition */
+#define column_length 31	/* Db name add table name <= 32 */
+#define max_clomun 127	/* Max columns */
+typedef struct _tbdef
+{
+    char cname[column_length];
+    short sequence;
+} tbdef;
+
+typedef struct _table
+{
+	tbdef *def;
+	struct table *link;
+} table;

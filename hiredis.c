@@ -95,11 +95,11 @@ sequence_reset(
 }
 
 void 
-mini_storage(char *key, 
+mini_storage(unsigned int key, 
 			char *value)
 {
 	char buffer[63];
-	sprintf(buffer, "set %s %s", key, value);
+	sprintf(buffer, "set %d %s", key, value);
     reply = redisCommand(context, buffer);
     freeReplyObject(reply);
 }

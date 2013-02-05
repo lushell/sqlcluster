@@ -1,4 +1,5 @@
-/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. All rights reserved.
+/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. 
+			All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@ int connections = -1;
 
 void create_listener()
 {
+/*
 	pid_t listener_pid_t = fork();
 	if(listener_pid_t < 0)
 	{
@@ -34,12 +36,13 @@ void create_listener()
 		exit(-1);
 	}
 
-	if(listener_pid_t > 0 )
+	if(listener_pid_t > 0)
 	{
 		printf("[LSNCTL]:create listener successfull. "
 				"process id is %d.\n", listener_pid_t);
 	}
-	int ret, i;
+*/
+	int ret, i, listener_pid_t = 0;
 	if(listener_pid_t == 0)
 	{
 		struct sockaddr_in client;
@@ -48,7 +51,7 @@ void create_listener()
 
 		int sock, new_sock, maxsock;
 		maxsock = ip_sock;
-/* Init fd set */
+/* Init descriptor set */
 	    fd_set readfds;
 	    FD_ZERO(&readfds);
 	    FD_SET(ip_sock, &readfds);
@@ -81,24 +84,25 @@ void create_listener()
 					connections++;
 					client_socket[connections] = new_sock;
 #ifdef debug
-					printf("New client_socket[%d]=%d %s:%d, new_sock = %d.\n", connections, 
+					printf("New client_socket[%d]=%d %s:%d, new_sock = %d.\n", 
+												connections, 
 												client_socket[connections], 
 												inet_ntoa(client.sin_addr), 
 												ntohs(client.sin_port), new_sock);
 #endif
-				}
-				if(new_sock > maxsock)
-				{
-					maxsock = new_sock;
-					create_thread(client_socket[connections]);
-				}
-				else
-				{
-					close(new_sock);
+					if(new_sock > maxsock)
+					{
+						maxsock = new_sock;
+						create_thread(client_socket[connections]);
+					}
+					else
+					{
+						close(new_sock);
+					}
 				}
 			}
 		}
-/* Close fd */
+/* Shutdown network connections */
 		for(i = 0; i < QUEUE_LENGTH; i++)
 		{
 			if(client_socket[i] != 0)

@@ -1,35 +1,25 @@
 %{
 #include <stdio.h>
-<<<<<<< HEAD
 #include <string.h>
 #include <math.h>
-int sqlnum=0;
 char *sql_type;
+char *text;
 %}
 
 %%
-["\;"]		sqlnum++;
-["select"]	sql_type = yytext;
-["from"]	    printf("%s\n", yytext);
-["where"]		printf("%s\n", yytext);
-[0-9]*[a-zA-Z]*	printf("%s\n", yytext);
+["select"|"insert"]	printf("sql_type is %s\n", sql_type = yytext);
+[0-9]*[a-zA-Z]*	printf("sql text is %s\n", text = yytext);
 .
 %%
-=======
-#include <math.h>
-#include <string.h>
-%}
-int 	[0-9]+
-float	[0-9]*\.[0-9]+
-%%
->>>>>>> c43e9e766be03fa9ec79c2bd3568b372730a7f34
 
-int main(void)
+int sql_parse(struct command *s)
+/* int main(int argc, char *argv[]) */
 {
+	char *str = (char *)s->str;
+	yyin = str;
 	yylex();
-	printf("sql type is %s, sql sum is %d\n", sql_type, sqlnum);
 	return 0;
-}	
+}
 
 int yywrap()
 {
