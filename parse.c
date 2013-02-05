@@ -25,5 +25,11 @@ int command_parse(packet *command_packet)
 #ifdef debug
 	printf("cmd.str = %s\n", cmd.str);
 #endif
+<<<<<<< HEAD
 	return sql_parse(&cmd);
+=======
+//	return sql_parse(&cmd);
+//	mini_storage(key, value)
+	return 0;	
+>>>>>>> c43e9e766be03fa9ec79c2bd3568b372730a7f34
 }
