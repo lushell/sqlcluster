@@ -39,6 +39,7 @@ void close_server()
 
 int main(int argc, char *argv[])
 {
+	printf("%d\n", argc);
 	open_listen_port();
 	init_kernel();
 	create_listener();
