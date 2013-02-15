@@ -1,11 +1,7 @@
-objects=sqlclient.o redis.o
-bin=sqlclient redis
-sqlclient:$(objects)
-	gcc -Wall -O3 sqlclient.o -o sqlclient
-	gcc -Wall -O3 -I../include -L../lib -lpthread -lhiredis redis.o -o redis
-sqlclient.o:
-redis.o:
-
-.PHONY:clean
+fb1-5:fb1-5.l fb1-5.y
+	bison -d fb1-5.y
+	flex fb1-5.l
+	cc -o $@ fb1-5.tab.c lex.yy.c -lfl
+.PHYON:clean
 clean:
-	rm -f $(objects) $(bin)
+	rm -f lex.yy.c fb1-5.tab.c fb1-5 fb1-5.tab.h

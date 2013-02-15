@@ -18,6 +18,7 @@
 #include <time.h>
 #include <string.h>
 #include <netinet/in.h>
+#include "global.h"
 
 /* Global */
 
@@ -37,9 +38,17 @@ void close_server()
 	close_redis_connect();
 }
 
+int init_command_line(int argc, char **argv)
+{
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
-	printf("%d\n", argc);
+	if(argc > 1)
+	{
+		init_command_line(argc, argv);
+	}
 	open_listen_port();
 	init_kernel();
 	create_listener();

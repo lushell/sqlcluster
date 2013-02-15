@@ -8,6 +8,8 @@ depend = -I./include -L./lib
 
 all:$(objects)
 	gcc $(wall) $(opt) $(objects) $(depend) $(lib) -g -o $(bin)
+	cd heartbeat && make
+	cd sqlclient && make
 lex.yy.o:lex.yy.c
 lex.yy.c:parse.yy
 	flex   parse.yy
@@ -19,3 +21,5 @@ redis.o:redis.c redis.h libredis.h
 clean:
 	rm -f $(objects) $(bin)
 	rm -f lex.yy.c
+	cd heartbeat && rm -f *.o
+	cd sqlclient && rm -f *.o

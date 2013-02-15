@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-#define debug
+//#define debug
 
 #define TCP 6
 #define backlog 1023

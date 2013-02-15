@@ -2,21 +2,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-char *sql_type;
-char *text;
+char *cmd_type;
+char *cmd_text;
 %}
 
 %%
-["select"|"insert"]	printf("sql_type is %s\n", sql_type = yytext);
-[0-9]*[a-zA-Z]*	printf("sql text is %s\n", text = yytext);
+"select"|"insert"	printf("sql_type is %s\n", cmd_type = yytext);
+[0-9]*[a-zA-Z]*	printf("sql text is %s\n", cmd_text = yytext);
 .
 %%
 
-int sql_parse(struct command *s)
-/* int main(int argc, char *argv[]) */
+int sql_parse()
 {
-	char *str = (char *)s->str;
-	yyin = str;
 	yylex();
 	return 0;
 }

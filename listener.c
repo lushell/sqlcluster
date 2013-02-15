@@ -28,7 +28,6 @@ int connections = -1;
 
 void create_listener()
 {
-/*
 	pid_t listener_pid_t = fork();
 	if(listener_pid_t < 0)
 	{
@@ -41,8 +40,7 @@ void create_listener()
 		printf("[LSNCTL]:create listener successfull. "
 				"process id is %d.\n", listener_pid_t);
 	}
-*/
-	int ret, i, listener_pid_t = 0;
+	int ret, i ; //listener_pid_t = 0;
 	if(listener_pid_t == 0)
 	{
 		struct sockaddr_in client;
