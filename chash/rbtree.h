@@ -1,64 +1,109 @@
-/*file:RBTree.h*/
-#ifndef CHIYX_RBTREE_
-#define CHIYX_RBTREE_
-#ifndef NULL
-#define NULL 0
-#endif
-#define BOOL int
-#define TRUE 1
-#define FALSE 0
+#include <stdlib.h>
+
+typedef unsigned int u_int;
+typedef unsigned char u_char;
+typedef long util_long;
+
+typedef struct util_rbtree_s util_rbtree_t;
+typedef struct util_rbtree_node_s util_rbtree_node_t;
+
+struct util_rbtree_node_s
+{
+    long key;
+    util_rbtree_node_t *parent;
+    util_rbtree_node_t *right;
+    util_rbtree_node_t *left;
+    int color;
+	void *data;
+};
+
+struct util_rbtree_s
+{
+    util_rbtree_node_t *root;
+    util_rbtree_node_t  null;
+    u_int size;
+};
+
+
+#define util_rbt_black(rbnode)   ((rbnode)->color = 1)
+#define util_rbt_red(rbnode)     ((rbnode)->color = 0)
+#define util_rbt_isblack(rbnode) ((rbnode)->color == 1)
+#define util_rbt_isred(rbnode)   ((rbnode)->color == 0)
+
+/* clear a node's link */
+#define rbt_clear_node(node) do{ \
+	node->left = NULL;  \
+	node->right = NULL; \
+	node->parent = NULL; \
+	}while(0)
+
+/* is the tree empty */
+#define util_rbtree_isempty(rbtree) ((rbtree)->root == &(rbtree)->null)
+
+/* 
+ * find the min node of tree 
+ * return NULL is tree is empty
+ */
+#define util_rbtree_min(rbtree) util_rbsubtree_min((rbtree)->root, &(rbtree)->null)
+
+/* 
+ * find the max node of tree 
+ * return NULL is tree is empty
+ */
+#define util_rbtree_max(rbtree) util_rbsubtree_max((rbtree)->root, &(rbtree)->null)
+
+void util_rbtree_init(util_rbtree_t *rbtree);
+void util_rbtree_insert(util_rbtree_t *rbtree, util_rbtree_node_t *node);
+void util_rbtree_delete(util_rbtree_t *rbtree, util_rbtree_node_t *node);
+
+/* 
+ * search node with key = @key in the tree
+ * if no such node exist, return NULL
+ */
+util_rbtree_node_t* util_rbtree_search(util_rbtree_t *rbtree, long key);
+
 /*
-* 红黑树是满足如下性质的一棵二叉查找树：
-* (1) 每个结点只能是红黑或者黑色结点中的一种
-* (2) 根结点是黑色的
-* (3) 叶子结点是黑色的（具体实现可以定义个空结点或者NULL默认表示为叶子结点）
-* (4) 如果一个结点是红色的，则它的孩子结点为黑色
-* (5) 对每个结点而言，从这个结点到叶子结点的任意路径上具有相同数目的黑色结点
-*/
+ * look node in the tree
+ * return the first node with key >= @key;
+ * if @key > all the key values in the tree, return the node with minimum key
+ * return NULL if tree is empty
+ */
+util_rbtree_node_t* util_rbtree_lookup(util_rbtree_t *rbtree, long key);
+
+/* 
+ * find the min node of subtree 
+ * @rbnode: root of the subtree
+ * @sentinel : the sentinel node 
+ * return NULL if subtree is empty
+ */
+util_rbtree_node_t* util_rbsubtree_min(util_rbtree_node_t *node, util_rbtree_node_t *sentinel);
+
+/* 
+ * find the max node of subtree 
+ * @rbnode: root of the subtree
+ * @sentinel : the sentinel node
+ * return NULL if subtree is empty
+ */
+util_rbtree_node_t* util_rbsubtree_max(util_rbtree_node_t *node, util_rbtree_node_t *sentinel);
+
 /*
-* 红黑树的特点(也是红黑树是一棵好的二叉查找树的原因):
-* 一棵具有n个内结点（即真正的数据结点）的红黑树的黑高度bh至多为2lg(n+1)
-* 证明: 先求证：一棵以x的根的红黑树中至少包含2(hb(x))(指数) - 1 个内结点
-* (1) 如果x的高度为0，则 x至少包含 2的0次方 - 1 = 0 个内结点，成立。
-* (2) 若x有子树，则其子树的黑高度为 bh(x) （孩子节点为黑色时），或者bh(x) -1（孩子结点为红色或者黑色时）
-* (3) 因为x的孩子的黑高度小于x的黑高度，利用归纳假设，可以得出每个孩子至少包含2的 bh(x) -1 次方 - 1
-* (4) 于是以x为根的子树至少包含 2 (bh(x) -1 次方) - 1 + 2 (bh(x) -1 次方) - 1 + 1 = 2 (bh(x)次方) - 1 个内结点
-* 又根据性质（4），树的黑高度至少为 h / 2 , 所以 n >= 2 (h / 2 次方) - 1 => h <= 2 lg (n - 1)
-*/
+ * check whether a tree is a rb tree, the null node is n't checked
+ * return 0: yes
+ * return 1: root isn't black
+ * return 2: node is in other color than black and red
+ * return 3: tree's black height isn't unique
+ * return 4: a red node with parent in red exists
+ * return 5: volatile binary search properties
+ *
+ * when return !0, @blackheight & @maxdepth is uselsess
+ * when return 0, @blackheight contains the tree's black height
+ *
+ * @maxdepth contains the max length of all simple roads from root to it's leaf nodes
+ */
+int util_rbtree_check(const util_rbtree_t *rbtree, int *blackheight, int *maxdepth);
 
-/*定义颜色类型*/
-typedef enum color_t {
-	RED = 0,
-	BLACK = 1
-}color_t; 
-
-//定义数据类型
-typedef int data_t;
-
-//定义红黑树的节点结构
-typedef struct RBTreeNode {
-	data_t data;
-	color_t color;
-	RBTreeNode *left;
-	RBTreeNode *right;
-	RBTreeNode *parent;
-}RBTreeNode, *RBTree;
-
-//查找操作，不存在返回NULL
-RBTreeNode *rbSearch(RBTree *rbTree, data_t key);
-//返回最小结点
-RBTreeNode *rbMinImum(RBTree *rbTree);
-//返回最大结点
-RBTreeNode *rbMaxImum(RBTree *rbTree);
-//返回x的后继结点
-RBTreeNode *rbSuccessor(RBTreeNode *x);
-//返回x的前驱结点
-RBTreeNode *rbPredecessor(RBTreeNode *x);
-//插入结点
-BOOL rbInsertNode(RBTree *rbTree, data_t data);
-//删除第一个值为data的结点
-BOOL rbDeleteNode(RBTree *rbTree, data_t data);
-//中序遍历
-void rbInorderTraversal(RBTree *rbTree, void (*visitor)(RBTreeNode *node));
-#endif
-
+/*
+ * travel through a rb tree in sequence: left-root-right
+ * you CAN NOT do any operations that will break the RB properties
+ */
+void util_rbtree_mid_travel(util_rbtree_t *rbtree, void(*opera)(util_rbtree_node_t *, void *), void *data);

@@ -1,320 +1,549 @@
-/*
-* 二叉查找树的左旋操作,该操作要求x的右子树不为空
-*/
-static void rbTreeLeftRotate(RBTree *rbTree, RBTreeNode *x);
-/*
-* 二叉查找树的右旋操作,该操作要求x的左子树不为空
-*/
-static void rbTreeRightRotate(RBTree *rbTree, RBTreeNode *x);
+#include "rbtree.h"
 
-/*
-* 当插入一个节点后，用此过程来保持红黑树的性质
-*/
-static void rbTreeInsertFixup(RBTree *rbTree, RBTreeNode *x);
+/* the NULL node of tree */
+#define _NULL(rbtree) (&((rbtree)->null))
 
-/*
-* 当删除一个结点时，通过此过程保持红黑树的性质
-*/
-static void rbTreeDeleteFixup(RBTree *rbTree, RBTreeNode *parent, RBTreeNode *x);
+/* structues uesed to check a rb tree */
+struct rbtree_check_s
+{
+    short rbh; /* rb height of the tree */
+    short maxd; /* max depth of the tree */
+    int fini; /* check failed ? */
+    const util_rbtree_node_t *null; /* sentinel of the tree */
+};
 
-//插入操作
-//1. 新创建的结点，颜色为红色
-//2. 插入一个结点后，有可能破坏红黑树的性质，则必须对树作相应的调整，以便保持红黑树的性质
-BOOL rbInsertNode(RBTree *rbTree, data_t data) {
-	//1. 创建一个新结点
-	RBTreeNode *node, *p, *curNode;
+typedef struct rbtree_check_s rbtree_check_t;
 
-	node = (RBTreeNode *)malloc(sizeof(RBTreeNode));
-	if (node == NULL) return FALSE;
-	node->data = data;
-	node->color = RED;
-	node->left = NULL;
-	node->right = NULL;
+static void rbtree_insert_fixup(util_rbtree_t *rbtree, util_rbtree_node_t *node);
+static void rbtree_delete_fixup(util_rbtree_t *rbtree, util_rbtree_node_t *node);
+static void rbtree_left_rotate(util_rbtree_t *rbtree, util_rbtree_node_t *node);
+static void rbtree_right_rotate(util_rbtree_t *rbtree, util_rbtree_node_t *node);
 
-	curNode = *rbTree;
-	//找到新结点的插入位置, p保存着待插入结点的父结点
-	p = NULL;
-	while (curNode != NULL) {
-		p = curNode;
-		if (data < curNode->data) {
-			curNode = curNode->left;
-		} else {
-			curNode = curNode->right;
-		}
+void util_rbtree_init(util_rbtree_t *rbtree)
+{
+	if(rbtree != NULL)
+	{
+		util_rbt_black(_NULL(rbtree)); /* null MUST be black */
+		rbtree->root = _NULL(rbtree);
+		rbtree->size = 0;
 	}
-	//空树
-	if (p == NULL) {
-		*rbTree = node;
-	} else {
-		if (data < p->data) {
-			p->left = node;
-		} else {
-			p->right = node;
-		}
-	}
-	node->parent = p;
-	//关键：调整红黑树，以保持性质
-	rbTreeInsertFixup(rbTree, node);
-	return TRUE;
 }
 
-BOOL rbDeleteNode(RBTree *rbTree, data_t data) {
-	RBTreeNode *target, *realDel, *child;
-	
-	target = rbSearch(rbTree, data);
-	if (target != NULL) {
-		//找到待删除的真正结点位置
-		if (target->left == NULL || target->right == NULL) {
-			realDel = target;
-		} else {
-			realDel = rbSuccessor(target);
-		}
-		//将待删除节点的子树链接到其父节点上，待删除的节点最多只有一个子树
-		if (realDel->left != NULL) {
-			child = realDel->left;
-		} else {
-			child = realDel->right;
-		}
+util_rbtree_node_t* util_rbsubtree_min(util_rbtree_node_t *node, util_rbtree_node_t *sentinel)
+{
+    if(node == sentinel) return NULL;
+    while(node->left != sentinel) node = node->left;
+    return node;
+}
 
-		if (child != NULL) {
-			child->parent = realDel->parent;
-		} 
+util_rbtree_node_t* util_rbsubtree_max(util_rbtree_node_t *node, util_rbtree_node_t *sentinel)
+{
+    if(node == sentinel) return NULL;
+    while(node->right != sentinel) node = node->right;
+    return node;
+}
 
-		if (realDel->parent == NULL) {
-			*rbTree = child;
-		} else {
-			if (realDel->parent->left == realDel) {
-				realDel->parent->left = child;
-			} else {
-				realDel->parent->right = child;
+void util_rbtree_insert(util_rbtree_t *rbtree, util_rbtree_node_t *node)
+{
+    util_rbtree_node_t *x, *y;
+	if((rbtree==NULL) || (node==NULL) || (node==_NULL(rbtree)))
+	{
+		return;
+	}
+    /* the tree is empty */
+    if(rbtree->root == _NULL(rbtree))
+    {
+        rbtree->root = node;
+        node->parent = _NULL(rbtree);
+    }
+    else /* find the insert position */
+    {
+        x = rbtree->root;
+        while(x != _NULL(rbtree))
+        {
+            y = x;
+            if(node->key < x->key) x = x->left;
+            else x = x->right;
+        }
+        /* now y is node's parent */
+        node->parent = y;
+        if(node->key < y->key) y->left = node;
+        else y->right = node;
+    }
+
+    /* initialize node's link & color */
+    node->left = _NULL(rbtree);
+    node->right = _NULL(rbtree);
+    util_rbt_red(node);
+    /* fix up insert */
+    rbtree_insert_fixup(rbtree, node);
+	rbtree->size++;
+}
+
+/* insert may violate the rbtree properties, fix up the tree */
+void rbtree_insert_fixup(util_rbtree_t *rbtree, util_rbtree_node_t *node)
+{
+    util_rbtree_node_t *p, *u; /* u is the uncle node of node */
+    while(util_rbt_isred(node->parent))
+    {
+        p = node->parent;
+        if(p == p->parent->left) /* parent is the left child */
+        {
+            u = p->parent->right;
+            if(util_rbt_isred(u)) /* case 1: p & u are red */
+            {
+                util_rbt_black(u);
+                util_rbt_black(p);
+                util_rbt_red(p->parent);
+                node = p->parent;
+            }
+            else
+            {
+                if(node == p->right) /* case 2: p:read, u:black, node is right child */
+                {
+                    node = p;
+                    rbtree_left_rotate(rbtree, node); 
+                    p = node->parent;
+                }
+                /* case 3: p:read, u:black, node is left child */
+                util_rbt_black(p);
+                util_rbt_red(p->parent);
+                rbtree_right_rotate(rbtree, p->parent);
+            }
+        }
+        else /* parent is the right child */
+        {
+            u = p->parent->left;
+			if(util_rbt_isred(u))
+			{
+				util_rbt_black(u);
+				util_rbt_black(p);
+				util_rbt_red(p->parent);
+                node = p->parent;
 			}
-		}
-
-		if (target != realDel) {
-			target->data = realDel->data;
-		}
-
-		//删除的重新结点是黑色的才需要调整
-		if (realDel->color == BLACK) {
-			rbTreeDeleteFixup(rbTree, realDel->parent, child);
-		}
-		free(realDel);
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-}
-/*
-* 插入一个结点时。可能被破坏的性质为（4）如果一个结点是红色的，则它的孩子结点是黑色的
-* （2）根结点是黑色的
-*/
-static void rbTreeInsertFixup(RBTree *rbTree, RBTreeNode *x) {
-	RBTreeNode *p, *gparent, *uncle;
-
-	//纠正性质2
-	while ((p = x->parent) != NULL && p->color == RED){
-		gparent = p->parent;
-		//如果父结点是祖父结点的左孩子（因为父结点是红色结点，所以肯定有祖父结点）
-		if (p == gparent->left) {
-			uncle = gparent->right;
-			//情况1：如果存在叔父结点，并且叔父结点颜色为红色，则可以通过改变祖父，父亲和叔父结点的颜色
-			//使得当前存在破坏性质的结点沿树上升，由x变为其祖父
-			if (uncle != NULL && uncle->color == RED) {
-				gparent->color = RED;
-				p->color = BLACK;
-				uncle->color = BLACK;
-				x = gparent;
-			} 
-			//叔父不存在或者存在但是颜色是黑色的，则必须通过寻转来配合改变颜色来保持性质2
-			else {
-				// 情况2：x为其父结点的右孩子，通过左旋转换为情况3
-				if (x == p->right) {
-					//基于x的父结点做左旋，记原x结点位x‘
-					x = p;
-					rbTreeLeftRotate(rbTree, x);
-					//旋转后，重置x，使其仍未x节点的父结点（也即x’）
-					p = x->parent;
+			else
+			{
+				if(p->left == node)
+				{
+					node = p;
+					rbtree_right_rotate(rbtree, node);
+					p = node->parent;
 				}
-				//情况三：x为其父结点的左孩子，调整父结点和祖父结点的颜色，以纠正性质4，但是破坏了性质5
-				p->color = BLACK;
-				gparent->color = RED;
-				//基于祖父结点右旋以保持性质5
-				rbTreeRightRotate(rbTree, gparent);
-				//此时x->parent->color = BLACK, 循环结束
+				util_rbt_black(p);
+				util_rbt_red(p->parent);
+				rbtree_left_rotate(rbtree, p->parent);
 			}
-		} 
-		// 父结点是祖父结点的右孩子
-		else {
-			uncle = gparent->left;
-			//情况1：如果存在叔父结点，并且叔父结点颜色为红色，则可以通过改变祖父，父亲和叔父结点的颜色
-			//使得当前存在破坏性质的结点沿树上升，由x变为其祖父
-			if (uncle != NULL && uncle->color == RED) {
-				gparent->color = RED;
-				p->color = BLACK;
-				uncle->color = BLACK;
-				x = gparent;
-			} 
-			//情况2和情况3
-			else {
-				// 情况2：x为其父结点的左孩子，通过旋转换为右情况3
-				if (x == p->left) {
-					x = p;
-					rbTreeRightRotate(rbTree, x);
-					p = x->parent;
-				}
-				//情况三：x为其父结点的左孩子，调整父结点和祖父结点的颜色，以纠正性质4，但是破坏了性质5
-				p->color = BLACK;
-				gparent->color = RED;
-				//基于祖父结点左旋以保持性质5
-				rbTreeLeftRotate(rbTree, gparent);
-				//此时x->parent->color = BLACK, 循环结束
-			}
-		}
-	}
-	//保持性质2
-	(*rbTree)->color = BLACK;
+        }
+    }
+    /* mark root to black */
+    util_rbt_black(rbtree->root);
 }
 
-/*
-* 删除一个黑结点会导致如下三个问题： 
-* （1）如果被删除结点y是根结点，而y的一个红色孩子成为了新的根，则违反了性质2
-* （2）如何y的父结点和其孩子结点都是红色的，则违反了性质4
-* （3）删除y将导致先前包含y的任何路径上的黑结点树少一个，破坏了性质5。
-* 解决方案是：被删除的结点黑色属性下移到其孩子结点x上。此时性质5都得以保持，于是存在2种情况：
-* （1）x原来为红色，此时孩子结点属性是红黑，此时破坏了性质（1），（4），如果x还是树根则，破坏了性质（2）
-*		处理方式为：将x重新着色为黑色（此操作同时去除其多余的黑色属性），处理完毕，红黑树性质得以保持
-* （2）x原来为黑色，此时x的属性为双重黑色，破坏了性质（1），若x为树根，则可以只是简单的消除x多余的黑色属性
-*		否则需要做必要的旋转和颜色修改
-*/
-static void rbTreeDeleteFixup(RBTree *rbTree, RBTreeNode *parent, RBTreeNode *x) {
-	RBTreeNode *brother;
 
-	while ((x == NULL || x->color == BLACK) && x != *rbTree) {
-		if (x == parent->left) {
-			brother = parent->right;
-			//因为被删除结点为黑色，其必然有兄弟结点,也即是现在x的兄弟结点（由性质5保证）
-			//情况1：如果兄弟结点为红色,则parent颜色比为黑色，此时调整颜色，并左旋，使得brother和
-			//parent位置调换，此操作不破坏别的性质，并将情况1变化为情况2，3，4
-			if (brother->color == RED) {
-				brother->color = BLACK;
-				parent->color = RED;
-				//左旋调整brother和parent的位置
-				rbTreeLeftRotate(rbTree, parent);
-				//重置brother，转换到情况2，3，4
-				brother = parent->right; //此时brohter颜色肯定为黑色，并且不为NULL
-			}
-			//情况2： brother有两个黑色结点（NULL也为黑色结点）:将x和brother抹除一重黑色
-			//具体操作为，brother的颜色变为红，x结点上移到其父结点
-			if ((brother->left == NULL || brother->left->color == BLACK) && 
-				(brother->right == NULL || brother->right->color == BLACK)) {
-					brother->color = RED;
-					x = parent;
-					parent = parent->parent;
-			} else {
-				//情况3： brother左孩子为红色结点，右孩子为黑色结点
-				if (brother->right == NULL || brother->color == BLACK) {
-					brother->left->color = BLACK;
-					brother->color = RED;
-					//右旋使情况3变化为情况4
-					rbTreeRightRotate(rbTree, brother);
-					//重置brother
-					brother = parent->right;
-				}
-				//情况4：brother的右孩子为红色结点:
-				//交换brother和parent的颜色和位置，使得x的2重黑色属性中的一重转移到其parent上
-				//此时到brother的右孩子的黑结点数少一，于是将右结点的颜色置黑，红黑树性质得以保持
-				brother->color = parent->color;
-				parent->color = BLACK;
-				brother->right->color = BLACK;
-				rbTreeLeftRotate(rbTree, parent);
-				
-				//至x为树根，结束循环
-				x = *rbTree;
-			}
-		} 
-		else {
-			brother = parent->left;
-			//情况1
-			if (brother->color == RED) {
-				brother->color = BLACK;
-				parent->color = RED;
-				rbTreeRightRotate(rbTree, parent);
-				brother = parent->left;
-			}
-			//情况2
-			if ((brother->left == NULL || brother->left->color == BLACK) && 
-				(brother->right == NULL || brother->right->color == BLACK)) {
-					brother->color = RED;
-					x = parent;
-					parent = parent->parent;
-			} else {
-				//情况3：： brother右孩子为红色结点，左孩子为黑色结点
-				if (brother->left  == NULL || brother->left->color == BLACK) {
-					brother->right->color = BLACK;
-					brother->color = RED;
-					rbTreeLeftRotate(rbTree, brother);
-					//重置brother
-					brother = parent->left;
-				}
-				//情况4： brother的左孩子为红色结点
-				brother->color = parent->color;
-				parent->color = BLACK;
-				brother->left->color = BLACK;
-				rbTreeRightRotate(rbTree, parent);
-
-				x = *rbTree; 
-			}
+void util_rbtree_delete(util_rbtree_t *rbtree, util_rbtree_node_t *node)
+{
+	int isblack;
+	util_rbtree_node_t *temp, *subst;
+	if((rbtree==NULL) || (node==NULL) || (node==_NULL(rbtree)))
+	{
+		return;
+	}
+	rbtree->size--;
+	/* find deleted position, indicated by temp */
+	if(node->left == _NULL(rbtree))
+	{
+		temp = node;
+		subst = node->right;
+	}
+	else if(node->right == _NULL(rbtree))
+	{
+		temp = node;
+		subst = node->left;
+	}
+	else /* right & left aren't null */
+	{
+		temp = util_rbsubtree_min(node->right, _NULL(rbtree));
+		if(temp->left != _NULL(rbtree))
+		{
+			subst = temp->left;
+		}
+		else
+		{
+			subst = temp->right;
 		}
 	}
-	if (x != NULL) {
-		x->color = BLACK;
+	if(temp == rbtree->root) /* temp is root */
+	{
+		rbtree->root = subst;
+		util_rbt_black(subst);
+		rbt_clear_node(temp);
+		return;
+	}
+	isblack = util_rbt_isblack(temp);
+	/* temp will be removed from it's position, rebuild links
+     * NOTE: if temp->parent = node, then subst->parent is node
+     * while node is the one to be delete, so relink subst's parent to temp
+     * because temp will replace node's in the tree
+     */
+    if(temp->parent == node)
+    {
+        subst->parent = temp;
+    }
+    else
+    {
+        subst->parent = temp->parent;
+    }
+
+	if(temp == temp->parent->left)
+	{
+		temp->parent->left = subst;
+	}
+	else
+	{
+		temp->parent->right = subst;
+	}
+	/*
+	 * now temp is removed from the tree.
+	 * so we will make temp to replace node in the tree.
+	 */
+	if(temp != node)
+	{
+		temp->parent = node->parent;
+		if(node == rbtree->root) /* node maybe root */
+		{
+			rbtree->root = temp;
+		}
+		else
+        {
+			if(node->parent->left == node)
+			{
+				node->parent->left = temp;
+			}
+			else
+			{
+				node->parent->right = temp;
+			}
+		}
+		temp->right = node->right; 
+		temp->left = node->left;
+		if(temp->left != _NULL(rbtree))
+		{
+			temp->left->parent = temp;
+		}
+		if(temp->right != _NULL(rbtree))
+		{
+			temp->right->parent = temp;
+		}
+		temp->color = node->color;
+	}
+	rbt_clear_node(node);
+
+	if(isblack)
+	{
+		/* temp is black, fix up delete */
+		rbtree_delete_fixup(rbtree, subst);
 	}
 }
 
-static void rbTreeLeftRotate(RBTree *rbTree, RBTreeNode *x) {
-	RBTreeNode *y;
-
-	y = x->right;
-	x->right = y->left;
-	if (y->left != NULL) {
-		y->left->parent = x;
+/* delete may violate the rbtree properties, fix up the tree */
+void rbtree_delete_fixup(util_rbtree_t *rbtree, util_rbtree_node_t *node)
+{
+    int h = 0;
+    util_rbtree_node_t *w;
+	while((node != rbtree->root) && util_rbt_isblack(node))
+	{
+        h++;
+        if(node == node->parent->left) /* node is left child */
+        {
+            w = node->parent->right;
+            if(util_rbt_isred(w))
+            {
+                util_rbt_black(w);
+                util_rbt_red(node->parent);
+                rbtree_left_rotate(rbtree, node->parent);
+                w = node->parent->right;
+            }
+            if(util_rbt_isblack(w->left) && util_rbt_isblack(w->right))
+            {
+                util_rbt_red(w);
+                node = node->parent;
+            }
+            else
+            {
+                if(util_rbt_isblack(w->right))
+                {
+                    util_rbt_black(w->left);
+                    util_rbt_red(w);
+                    rbtree_right_rotate(rbtree, w);
+                    w = node->parent->right;
+                }
+                w->color = node->parent->color;
+                util_rbt_black(node->parent);
+                util_rbt_black(w->right);
+                rbtree_left_rotate(rbtree, node->parent);
+                node = rbtree->root; /* to break loop */
+            }
+        }
+        else /* node is right child */
+        {
+            w = node->parent->left;
+            if(w == 0)
+            {
+                int t = 4;
+            }
+            if(util_rbt_isred(w))
+            {
+                util_rbt_black(w);
+                util_rbt_red(node->parent);
+                rbtree_right_rotate(rbtree, node->parent);
+                w = node->parent->left;
+            }
+            if(util_rbt_isblack(w->left) && util_rbt_isblack(w->right))
+            {
+                util_rbt_red(w);
+                node = node->parent;
+            }
+            else
+            {
+                if(util_rbt_isblack(w->left))
+                {
+                    util_rbt_black(w->right);
+                    util_rbt_red(w);
+                    rbtree_left_rotate(rbtree, w);
+                    w = node->parent->left;
+                }
+                w->color = node->parent->color;
+                util_rbt_black(node->parent);
+                util_rbt_black(w->left);
+                rbtree_right_rotate(rbtree, node->parent);
+                node = rbtree->root; /* to break loop */
+            }
+        }
 	}
-	y->parent = x->parent;
-	//x为树根
-	if (x->parent == NULL) {
-		*rbTree = y;
-	} else {
-		if (x->parent->left == x) {
-			x->parent->left = y;
-		} else {
-			x->parent->right = y;
-		}
-	}
-	y->left = x;
-	x->parent = y;
+    util_rbt_black(node);
 }
-static void rbTreeRightRotate(RBTree *rbTree, RBTreeNode *x) {
-	RBTreeNode *y;
 
-	y = x->left;
-
-	x->left = y->right;
-	if (y->right != NULL) {
-		y->right->parent = x;
+void rbtree_left_rotate(util_rbtree_t *rbtree, util_rbtree_node_t *node)
+{
+	util_rbtree_node_t *rc = node->right;
+	util_rbtree_node_t *rclc = rc->left;
+	/* make rc to replace node's position */
+	rc->parent = node->parent;
+	if(node == rbtree->root)
+	{
+		rbtree->root = rc;
 	}
-
-	y->parent = x->parent;
-	if (x->parent == NULL) {
-		*rbTree = y;
-	} else {
-		if (x->parent->left == x) {
-			x->parent->left = y;
-		} else {
-			x->parent->right = y;
+	else
+	{
+		if(node->parent->left == node) /* node is left child */
+		{
+			node->parent->left = rc;
+		}
+		else
+		{
+			node->parent->right = rc;
 		}
 	}
+	/* make node to be rc's left child */
+	node->parent = rc;
+	rc->left = node;
+	/* rc's left child to be node's right child */
+	node->right = rclc;
+	if(rclc != _NULL(rbtree))
+	{
+		rclc->parent = node;
+	}
+}
 
-	y->right = x;
-	x->parent = y;
+void rbtree_right_rotate(util_rbtree_t *rbtree, util_rbtree_node_t *node)
+{
+	util_rbtree_node_t *lc = node->left;
+	util_rbtree_node_t *lcrc = lc->right;
+	/* make lc to replace node's position */
+	lc->parent = node->parent;
+	if(node == rbtree->root)
+	{
+		rbtree->root = lc;
+	}
+	else
+	{
+		if(node->parent->left == node) /* node is left child */
+		{
+			node->parent->left = lc;
+		}
+		else
+		{
+			node->parent->right = lc;
+		}
+	}
+	/* make node to be lc's right child */
+	lc->right = node;
+	node->parent = lc;
+	/* lc's right child to be node's left child */	
+	node->left = lcrc;
+	if(lcrc != _NULL(rbtree))
+	{
+		lcrc->parent = node;
+	}
+}
+
+util_rbtree_node_t* util_rbtree_search(util_rbtree_t *rbtree, long key)
+{
+	if(rbtree != NULL)
+	{
+		util_rbtree_node_t *node = rbtree->root;
+		util_rbtree_node_t *null = _NULL(rbtree);
+		while(node != null)
+		{
+			if(key < node->key) node = node->left;
+			else if(key > node->key) node = node->right;
+			else if(node->key == key) return node;
+		}
+	}
+    return NULL;
+}
+
+util_rbtree_node_t* util_rbtree_lookup(util_rbtree_t *rbtree, long key)
+{
+	if((rbtree != NULL) && !util_rbtree_isempty(rbtree))
+	{
+		util_rbtree_node_t *node = NULL;
+        util_rbtree_node_t *temp = rbtree->root;
+		util_rbtree_node_t *null = _NULL(rbtree);
+		while(temp != null)
+		{
+			if(key <= temp->key)
+            {
+                node = temp; /* update node */
+                temp = temp->left;
+            }
+			else if(key > temp->key)
+            {
+                temp = temp->right;
+            }
+		}
+        /* if node==NULL return the minimum node */
+        return ((node != NULL) ? node : util_rbtree_min(rbtree));
+	}
+    return NULL;
+}
+
+static void rbtree_check_subtree(const util_rbtree_node_t *node, rbtree_check_t *check, 
+                         int level, int curheight)
+{
+    if(check->fini) /* already failed */
+    {
+        return;
+    }
+    /* check node color */
+    if(util_rbt_isblack(node))
+    {
+        curheight++;
+    }
+    else if(!util_rbt_isred(node))
+    {
+        check->fini = 2;
+        return;
+    }
+    /* check left */
+    if(node->left != check->null)
+    {
+        if(util_rbt_isred(node) && util_rbt_isred(node->left))
+        {
+            check->fini = 4;
+            return;
+        }
+        if(node->key < node->left->key)
+        {
+            check->fini = 5;
+            return;
+        }
+        rbtree_check_subtree(node->left, check, level+1, curheight);
+    }
+    else
+    {
+        goto __check_rb_height;
+    }
+    /* check right */
+    if(node->right != check->null)
+    {
+        if(util_rbt_isred(node) && util_rbt_isred(node->right))
+        {
+            check->fini = 4;
+            return;
+        }
+        if(node->key > node->right->key)
+        {
+            check->fini = 5;
+            return;
+        }
+        rbtree_check_subtree(node->right, check, level+1, curheight);
+    }
+    else
+    {
+        goto __check_rb_height;
+    }
+    return;
+__check_rb_height:
+    if(check->rbh == 0)
+    {
+        check->rbh = curheight;
+    }
+    if(check->maxd < level)
+    {
+        check->maxd = level;
+    }
+    if(check->rbh != curheight)
+    {
+        check->fini = 3;
+    }
+}
+
+int util_rbtree_check(const util_rbtree_t *rbtree, int *blackheight, int *maxdepth)
+{
+    rbtree_check_t check;
+    if(rbtree->root == _NULL(rbtree))
+    {
+        return 0;
+    }
+    if(!util_rbt_isblack(rbtree->root))
+    {
+        return 1;
+    }
+    check.fini = check.maxd = check.rbh = 0;
+    check.null = _NULL(rbtree);
+    rbtree_check_subtree(rbtree->root, &check, 1, 0);
+    if(blackheight)
+    {
+        *blackheight = check.rbh;
+    }
+    if(maxdepth)
+    {
+        *maxdepth = check.maxd;
+    }
+    return check.fini;
+}
+
+static void rbtree_mid_travel(util_rbtree_node_t *node, util_rbtree_node_t *sentinel, 
+                         void(*opera)(util_rbtree_node_t *, void *), void *data)
+{
+    if(node->left != sentinel)
+    {
+        rbtree_mid_travel(node->left, sentinel, opera, data);
+    }
+    opera(node, data);
+    if(node->right != sentinel)
+    {
+        rbtree_mid_travel(node->right, sentinel, opera, data);
+    }
+}
+
+void util_rbtree_mid_travel(util_rbtree_t *rbtree, 
+                            void(*opera)(util_rbtree_node_t *, void *), void *data)
+{
+    if((rbtree!=NULL) && !util_rbtree_isempty(rbtree))
+    {
+        rbtree_mid_travel(rbtree->root, _NULL(rbtree), opera, data);
+    }
 }
 
