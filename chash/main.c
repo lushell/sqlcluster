@@ -52,6 +52,23 @@ int addnode(entity_node *node)
 	return 0;
 }
 
+entity_node * mylookup(void *object)
+{
+	if(object == NULL || vnodes == 0) 
+		return NULL;
+
+	util_rbtree_node_t * rbnode;
+	long key = md5hash(object);
+	printf("%ld\n", key);
+
+	rbnode = util_rbtree_lookup(vnode_tree, key);
+	if(rbnode != NULL)
+	{
+		printf("%s\n", rbnode->data);
+	}
+	return NULL;
+}
+
 int main(int argc, char *argv[])
 {
 	util_rbtree_init(vnode_tree);
@@ -59,7 +76,11 @@ int main(int argc, char *argv[])
 	entity_node node1;
 	strcpy(node1.ident, argv[1]);
 	strcpy(node1.data, argv[2]);
-	node1.vnum = 4;
+	node1.vnum = 64;
+
 	addnode(&node1);
+
+	mylookup((void *) argv[1]);
+
 	return 0;
 }
