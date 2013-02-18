@@ -64,7 +64,7 @@ entity_node * mylookup(void *object)
 	rbnode = util_rbtree_lookup(vnode_tree, key);
 	if(rbnode != NULL)
 	{
-		printf("%s\n", rbnode->data);
+		printf("%s\n", (char *)rbnode->data);
 	}
 	return NULL;
 }
