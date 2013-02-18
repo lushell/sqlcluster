@@ -4,6 +4,17 @@
 
 #include "md5hash.h"
 #include "rbtree.h"
+static inline struct page * rb_insert_page_cache(struct inode * inode,
+                         unsigned long offset,
+                         struct rb_node * node);
+
+static inline struct page * __rb_insert_page_cache(struct inode * inode,
+                           unsigned long offset,
+                           struct rb_node * node);
+
+static inline struct page * rb_search_page_cache(struct inode * inode,
+                         unsigned long offset);
+
 
 typedef struct _entity_node{
 	char ident[255];
@@ -131,39 +142,61 @@ int addnode(entity_node *node)
 	}
 	return 0;
 }
-<<<<<<< HEAD
 
-entity_node * mylookup(void *object)
+static inline struct page * rb_search_page_cache(struct inode * inode,
+						 unsigned long offset)
 {
-	if(object == NULL || vnodes == 0) 
-		return NULL;
+	struct rb_node * n = inode->i_rb_page_cache.rb_node;
+	struct page * page;
 
-	util_rbtree_node_t * rbnode;
-	long key = md5hash(object);
-	printf("%ld\n", key);
-
-	rbnode = util_rbtree_lookup(vnode_tree, key);
-	if(rbnode != NULL)
+	while (n)
 	{
-		printf("%s\n", (char *)rbnode->data);
+		page = rb_entry(n, struct page, rb_page_cache);
+
+		if (offset < page->offset)
+			n = n->rb_left;
+		else if (offset > page->offset)
+			n = n->rb_right;
+		else
+			return page;
 	}
 	return NULL;
 }
 
-int main(int argc, char *argv[])
+static inline struct page * __rb_insert_page_cache(struct inode * inode,
+						   unsigned long offset,
+						   struct rb_node * node)
 {
-	util_rbtree_init(vnode_tree);
-	
-	entity_node node1;
-	strcpy(node1.ident, argv[1]);
-	strcpy(node1.data, argv[2]);
-	node1.vnum = 64;
+	struct rb_node ** p = &inode->i_rb_page_cache.rb_node;
+	struct rb_node * parent = NULL;
+	struct page * page;
 
-	addnode(&node1);
+	while (*p)
+	{
+		parent = *p;
+		page = rb_entry(parent, struct page, rb_page_cache);
 
-	mylookup((void *) argv[1]);
+		if (offset < page->offset)
+			p = &(*p)->rb_left;
+		else if (offset > page->offset)
+			p = &(*p)->rb_right;
+		else
+			return page;
+	}
 
-	return 0;
+	rb_link_node(node, parent, p);
+
+	return NULL;
 }
-=======
->>>>>>> 2f6f1454c0935cd8f923a799a983ec766c76f5bc
+
+static inline struct page * rb_insert_page_cache(struct inode * inode,
+						 unsigned long offset,
+						 struct rb_node * node)
+{
+	struct page * ret;
+	if ((ret = __rb_insert_page_cache(inode, offset, node)))
+		goto out;
+	rb_insert_color(node, &inode->i_rb_page_cache);
+ out:
+	return ret;
+}

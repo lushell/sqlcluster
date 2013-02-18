@@ -9,7 +9,7 @@ typedef struct util_rbtree_node_s util_rbtree_node_t;
 
 struct util_rbtree_node_s
 {
-    long key;
+    long int key;
     util_rbtree_node_t *parent;
     util_rbtree_node_t *right;
     util_rbtree_node_t *left;

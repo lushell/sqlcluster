@@ -1,4 +1,5 @@
 #include "rbtree.h"
+#include <stdio.h>
 
 /* the NULL node of tree */
 #define _NULL(rbtree) (&((rbtree)->null))
@@ -23,7 +24,7 @@ void util_rbtree_init(util_rbtree_t *rbtree)
 {
 	if(rbtree != NULL)
 	{
-		util_rbt_black(_NULL(rbtree)); /* null MUST be black */
+		rbtree->root->color = 1;
 		rbtree->root = _NULL(rbtree);
 		rbtree->size = 0;
 	}
@@ -31,8 +32,10 @@ void util_rbtree_init(util_rbtree_t *rbtree)
 
 util_rbtree_node_t* util_rbsubtree_min(util_rbtree_node_t *node, util_rbtree_node_t *sentinel)
 {
-    if(node == sentinel) return NULL;
-    while(node->left != sentinel) node = node->left;
+    if(node == sentinel) 
+		return NULL;
+    while(node->left != sentinel) 
+		node = node->left;
     return node;
 }
 
@@ -50,13 +53,14 @@ void util_rbtree_insert(util_rbtree_t *rbtree, util_rbtree_node_t *node)
 	{
 		return;
 	}
-    /* the tree is empty */
+    /* The tree is empty */
     if(rbtree->root == _NULL(rbtree))
     {
-        rbtree->root = node;
+        rbtree->root = node; 
+		printf(" rbtree->root key = %ld\n", rbtree->root->key);
         node->parent = _NULL(rbtree);
     }
-    else /* find the insert position */
+    else /* Find the insert position */
     {
         x = rbtree->root;
         while(x != _NULL(rbtree))
@@ -65,13 +69,23 @@ void util_rbtree_insert(util_rbtree_t *rbtree, util_rbtree_node_t *node)
             if(node->key < x->key) x = x->left;
             else x = x->right;
         }
-        /* now y is node's parent */
+        /* Now y is node's parent */
         node->parent = y;
-        if(node->key < y->key) y->left = node;
-        else y->right = node;
+        if(node->key < y->key) 
+		{
+			y->left = node;
+			printf("rbtree y->left->key = %ld, y->left->data = %s\n", 
+							y->left->key, y->left->data);
+		}
+        else 
+		{
+			y->right = node;
+			printf("rbtree y->right->key = %ld, y->right->data = %s\n", 
+							y->right->key, y->right->data);
+		}
     }
 
-    /* initialize node's link & color */
+    /* Initialize node's link & color */
     node->left = _NULL(rbtree);
     node->right = _NULL(rbtree);
     util_rbt_red(node);
@@ -546,4 +560,3 @@ void util_rbtree_mid_travel(util_rbtree_t *rbtree,
         rbtree_mid_travel(rbtree->root, _NULL(rbtree), opera, data);
     }
 }
-
