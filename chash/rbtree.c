@@ -241,7 +241,7 @@ static rb_node_t* rb_search_auxiliary(hash_key key, rb_node_t* root, rb_node_t**
     rb_node_t *node = root, *parent = NULL;
     int ret;
 
-    while (node)
+    while(node)
     {
         parent = node;
         ret = node->key - key;
@@ -314,7 +314,6 @@ rb_node_t* rb_delete(hash_key key, rb_node_t *root)
 
     if (!(node = rb_search_auxiliary(key, root, NULL)))
     {
-        printf("key %d is not exist!\n");
         return root;
     }
     old = node;
