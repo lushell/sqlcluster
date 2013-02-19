@@ -14,7 +14,7 @@
 int ip_sock;
 
 /* Structure kernel data */
-#define net_length  16383
+#define net_length  0xffff /* 64K, Compatible Text type. */
 typedef struct _command
 {
 	char str[net_length];

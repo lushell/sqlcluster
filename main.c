@@ -21,6 +21,7 @@
 #include "global.h"
 
 /* Global */
+#define start_server()	create_listener();
 
 /* Thread mutex , cond */
 pthread_mutex_t connections_mutex;
@@ -40,7 +41,9 @@ void close_server()
 
 int init_command_line(int argc, char **argv)
 {
-	return 0;
+	printf("The current version not support command line!\n"
+			"Please direct running cluster(command).\n");
+	exit(0);
 }
 
 int main(int argc, char *argv[])
@@ -51,7 +54,7 @@ int main(int argc, char *argv[])
 	}
 	open_listen_port();
 	init_kernel();
-	create_listener();
+	start_server();
 	close_server();
 	return 0;
 }

@@ -1,169 +1,90 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
 #include "md5hash.h"
-#include "rbtree.h"
-
-typedef struct _entity_node{
-	char ident[255];
-	int	vnum;
-	char data[255];
-} entity_node;
+#include "init.h"
+#include "node.h"
 
 
-util_rbtree_t *vnode_tree;
-
-int vnodes = 0;
-
-entity_node * mylookup(void *object)
+/*****************************************************************/
+int main(int argc, char *argv[])
 {
-	if(object == NULL || vnodes == 0) 
-		return NULL;
-
-	util_rbtree_node_t * rbnode;
-	rbnode = (util_rbtree_node_t *)malloc(sizeof(rbnode));
-	memset(rbnode, 0, sizeof(rbnode));
-	long int hash_key = md5hash(object);
-
-	rbnode = util_rbtree_search(vnode_tree, hash_key);
-	if(rbnode != NULL)
+    int i, count = atoi(argv[1]);
+	if(count > nodes + 0xff || count <= 0)
 	{
-		printf("%s\n", rbnode->data);
+		printf("stdin error\n");
+		exit(0);
+	}
+    hash_key key;
+    rb_node_t* root = NULL, *node = NULL;
+	unsigned char id[8];
+	pnode mac_node[nodes + 0xff];
+	my_init(mac_node);
+	for(i = 0; i < count; i++)
+	{
+		printf("node%d=%s.\n", mac_node[i].id, mac_node[i].ipv4);
+	}
+	printf("\n"
+		"***********************************************************\n"
+		"***********************************************************\n"
+		"**********************Init success*************************\n"
+		"***********************************************************\n"
+		"***********************************************************\n");
+	
+
+/* add node */
+    for (i = 0; i < count; i++)
+    {
+		sprintf(id, "%d", mac_node[i].id);
+        key = md5hash(id);
+		printf("ipv4 = %s\n", mac_node[i].ipv4);
+        if ((root = rb_insert(key, mac_node[i].ipv4, root)))
+        {
+            printf("insert key[%ld], rbnode key[%ld] = value[%s] success!\n", 
+					key, root->key,  root->data);
+        }
+        else
+        {
+            printf("insert key[%ld] error!\n", key);
+            exit(-1);
+        }
+	}
+
+/* update node */
+	sprintf(id, "%d", mac_node[2].id);
+	key = md5hash((void *)id);
+	char c[] = "100.100.100.100", ret;
+	if(ret = rb_update(key, root, c))
+	{
+		printf("update key[%ld] to new data %s error!\n", key, c);
 	}
 	else
 	{
-		printf("[%s hash = %ld]rbnode is null!\n", (char *)object, hash_key);
-	}
-	free(rbnode);
-	return NULL;
-}
-
-int addnode(entity_node *node);
-int main(int argc, char *argv[])
-{
-	util_rbtree_init(vnode_tree);
-    char baidu[] = "www.baidu.com";
-	char baiduip[] = "192.168.1.1";	
-	entity_node *node1, *node2, *node3, *node4; 
-	entity_node node[1023];
-	int i;
-	for(i = 0; i < 1023 + 1; i++)
-	{
-		node[i].vnum = 0;	
-	}
-	
-	strcpy(node[1].ident, baidu); 
-	strcpy(node[2].ident, "www.360buy.com"); 
-	strcpy(node[3].ident, "www.qq.com"); 
-	strcpy(node[4].ident, "host.peking"); 
-	strcpy(node[1].data, baiduip); 
-	strcpy(node[2].data, "10.10.1.1"); 
-	strcpy(node[3].data, "2.2.2.2"); 
-	strcpy(node[4].data, "1.1.1.1"); 
-	node[1].vnum = node[2].vnum = node[3].vnum = node[4].vnum= 8;
-	for(i = 0; i < 1024; i++)
-	{
-		if(node[i].vnum > 0)
-		{
-			printf("i = %d, %s, %s, %d\n", i, node[i].ident, node[i].data, node[i].vnum);
-			addnode(&node[i]);
-		}
+		printf("update key[%ld] to new data %s success!\n", key, c);
 	}
 
-#define _NULL(rbtree) (&((rbtree)->null))
-	long key = md5hash((void *)"www.qq.com1");
-    if(vnode_tree != NULL)
-    {   
-        util_rbtree_node_t *snode = vnode_tree->root;
-        util_rbtree_node_t *null = _NULL(vnode_tree);
-        while(snode != null)
-        {   
-            if(key < snode->key) 
-				snode = snode->left;
-            else if(key > snode->key) 
-				snode = snode->right;
-            else if(snode->key == key) 
-				printf("%ld\n", snode->key);
-				
-        } 
-    } 
-	return 0;
+/* search and delete */
+    for (i = 0; i < count; i++)
+    {
+		sprintf(id, "%d", mac_node[i].id);
+        key = md5hash((void *)id);
+        if ((node = rb_search(key, root)))
+        {
+            printf("search key %ld success, data %s!\n", key, node->data);
+        }
+        else
+        {
+            printf("search key %ld no data!\n", key);
+        }
+
+            if ((root = rb_delete(key, root)))
+            {
+                printf("delete key %ld success\n", key);
+            }
+            else
+            {
+                printf("delete key %ld error\n", key);
+            }
+    }
+    return 0;
 }
-
-int addnode(entity_node *node)
-{
-	if(node == NULL)
-		return -1;
-
-	int max_vnode = node->vnum;
-	if(max_vnode <= 0) 
-		return -1;
-
-	util_rbtree_node_t *rbnode;
-	rbnode = (util_rbtree_node_t *)malloc(sizeof(rbnode));
-	memset(rbnode, 0, sizeof(rbnode));
-
-	char str [1023];
-
-	long int hash = 0;
-	int i;
-	unsigned char num[7];
-	for(i = 0; i < max_vnode; i++)
-	{
-		memset(str, 0, 1023 + 1);
-		strncpy(str, node->ident, strlen(node->ident));
-		sprintf(num, "%d", i);
-		strcat(str, num);
-		hash = md5hash((void *)str);
-		if(!util_rbtree_search(vnode_tree, hash))
-		{
-			rbnode->key = hash;
-			rbnode->data = node->data;
-			if(rbnode != NULL)
-			{
-				printf("add vnodes \t%ld\t(%s), %s into rbtree.\n", 
-								rbnode->key, str, rbnode->data);
-				util_rbtree_insert(vnode_tree, rbnode);
-				vnodes++;
-			}
-		}
-	}
-	return 0;
-}
-<<<<<<< HEAD
-
-entity_node * mylookup(void *object)
-{
-	if(object == NULL || vnodes == 0) 
-		return NULL;
-
-	util_rbtree_node_t * rbnode;
-	long key = md5hash(object);
-	printf("%ld\n", key);
-
-	rbnode = util_rbtree_lookup(vnode_tree, key);
-	if(rbnode != NULL)
-	{
-		printf("%s\n", (char *)rbnode->data);
-	}
-	return NULL;
-}
-
-int main(int argc, char *argv[])
-{
-	util_rbtree_init(vnode_tree);
-	
-	entity_node node1;
-	strcpy(node1.ident, argv[1]);
-	strcpy(node1.data, argv[2]);
-	node1.vnum = 64;
-
-	addnode(&node1);
-
-	mylookup((void *) argv[1]);
-
-	return 0;
-}
-=======
->>>>>>> 2f6f1454c0935cd8f923a799a983ec766c76f5bc

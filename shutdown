@@ -1,2 +1,2 @@
 #!/bin/bash
-ps aux | grep "./cluster" | awk '{print $2}' | head -1 | xargs kill
+ps aux | grep -w "cluster" | awk '{print $2}' | head -1 | xargs kill

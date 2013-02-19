@@ -1,4 +1,4 @@
-objects = hash.o hiredis.o parse.o lex.yy.o proc_main.o mutthread.o listener.o net.o main.o
+objects = hash.o hiredis.o parse.o lex.yy.o proc_main.o mutthread.o listener.o net.o main.o sort.o
 wall=-Wall
 opt=-O3
 lib=-lpthread -lhiredis
@@ -7,7 +7,8 @@ depend = -I./include -L./lib
 
 
 all:$(objects)
-	gcc $(wall) $(opt) $(objects) $(depend) $(lib) -g -o $(bin)
+	gcc $(wall) $(opt) $(objects) \
+	$(depend) $(lib) -g -o $(bin)
 	cd heartbeat && make
 	cd sqlclient && make
 	cd chash && make
