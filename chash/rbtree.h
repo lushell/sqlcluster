@@ -18,4 +18,4 @@ typedef struct rb_node_t
 rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root);
 rb_node_t* rb_search(hash_key key, rb_node_t* root);
 rb_node_t* rb_delete(hash_key key, rb_node_t* root);
-int rb_update(hash_key key, rb_node_t* root, data_t data);
+hash_key rb_update(hash_key key, rb_node_t* root, data_t data);

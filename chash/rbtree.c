@@ -239,7 +239,7 @@ static rb_node_t* rb_delete_rebalance(rb_node_t *node, rb_node_t *parent, rb_nod
 static rb_node_t* rb_search_auxiliary(hash_key key, rb_node_t* root, rb_node_t** save)
 {
     rb_node_t *node = root, *parent = NULL;
-    int ret;
+    hash_key ret;
 
     while(node)
     {
@@ -312,6 +312,7 @@ rb_node_t* rb_delete(hash_key key, rb_node_t *root)
     rb_node_t *child, *parent, *old, *left, *node;
     color_t color;
 
+/* Step 1, search key if not exist, return  */
     if (!(node = rb_search_auxiliary(key, root, NULL)))
     {
         return root;
@@ -425,10 +426,10 @@ rb_node_t* rb_delete(hash_key key, rb_node_t *root)
     return root;
 }
 
-static int rb_update_auxiliary(hash_key key, rb_node_t* root,  data_t data, rb_node_t **save)
+static hash_key rb_update_auxiliary(hash_key key, rb_node_t* root,  data_t data, rb_node_t **save)
 {
     rb_node_t *node = root, *parent = NULL;
-    int ret;
+	hash_key ret;
 
     while (node)
     {
@@ -456,7 +457,7 @@ static int rb_update_auxiliary(hash_key key, rb_node_t* root,  data_t data, rb_n
     return -1;
 }
 
-int rb_update(hash_key key, rb_node_t* root,  data_t data)
+hash_key rb_update(hash_key key, rb_node_t* root,  data_t data)
 {
 	return rb_update_auxiliary(key, root, data, NULL);
 }

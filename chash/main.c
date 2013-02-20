@@ -6,6 +6,7 @@
 #include "node.h"
 
 
+int vnodes = 0;
 /*****************************************************************/
 int main(int argc, char *argv[])
 {
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
         {
             printf("insert key[%ld], %s success!\n", 
 					key, mac_node[i].ipv4);
+			vnodes++;
         }
         else
         {
@@ -51,6 +53,7 @@ int main(int argc, char *argv[])
         }
 	}
 
+	printf("rbtree data node sum = %d\n", vnodes);
 /* update node */
 /*
 	printf("******************update*********************\n");
@@ -90,11 +93,13 @@ int main(int argc, char *argv[])
         if ((root = rb_delete(key, root)))
         {
             printf("delete key %ld , %s success\n", key, mac_node[i].ipv4);
+			vnodes--;
         }
         else
         {
             printf("delete key %ld->%s\n", key, root);
         }
     }
+	printf("rbtree data node sum = %d\n", vnodes);
     return 0;
 }
