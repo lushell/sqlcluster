@@ -1,7 +1,7 @@
 #include "rbtree.h"
 /* Entity node, storage in array */
 typedef struct _pnode {
-	unsigned short id;
+	unsigned int id;
 	char	ipv4[32];	/* Compatible ipv4 */
 //	char ipv6[31];		/* Compatible ipv6 */
 } pnode;

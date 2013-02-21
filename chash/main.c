@@ -26,14 +26,14 @@ int vnodes = 0;
 int main(int argc, char *argv[])
 {
     int i, count = atoi(argv[1]);
-	if(count > nodes + 0xff || count < 0)
+	if(count > nodes + 0xfff || count < 0)
 	{
 		printf("stdin error\n");
 		exit(0);
 	}
 
 /* Init node */
-	pnode mac_node[nodes + 0xfff];
+	pnode mac_node[nodes + 0xffff];
 	my_init(mac_node);
 	for(i = 0; i < count; i++)
 	{

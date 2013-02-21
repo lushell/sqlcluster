@@ -7,7 +7,7 @@
 int add_vnode(pnode *vnode, rb_node_t* root)
 {
 	unsigned char id[1024];
-	unsigned char tmp[0xff];
+	unsigned char tmp[0xffff];
 	unsigned int i, key;
     for (i = 0; i < vnum_max; i++)
     {
