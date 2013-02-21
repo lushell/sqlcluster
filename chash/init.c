@@ -26,7 +26,7 @@ int my_init(pnode *node)
 	FILE *fp = fopen("/home/sqlcluster/sqlcluster/chash/stdin.txt","r");
 	int i = 0;
 	char buf[31];
-	while(i < 0xfff)
+	while(i < 0xfff)	/* 4096 */
 	{
 		if(fgets(buf, 31, fp))
 		{
