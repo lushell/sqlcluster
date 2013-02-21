@@ -27,7 +27,6 @@ int command_parse(packet *command_packet)
 	printf("cmd.str = %s\n", cmd.str);
 #endif
 	unsigned int key = simple_hash(cmd.str);
-	printf("key = %u\n", key);
 	mini_storage(key, command_packet->net);
 	return 0;
 }

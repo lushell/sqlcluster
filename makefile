@@ -5,7 +5,6 @@ lib=-lpthread -lhiredis
 bin=cluster
 depend = -I./include -L./lib
 
-
 all:$(objects)
 	gcc $(wall) $(opt) $(objects) \
 	$(depend) $(lib) -g -o $(bin)

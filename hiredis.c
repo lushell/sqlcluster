@@ -98,8 +98,15 @@ void
 mini_storage(unsigned int key, 
 			char *value)
 {
-	char buffer[63];
-	sprintf(buffer, "set %d %s", key, value);
-    reply = redisCommand(context, buffer);
+    reply = redisCommand(context, "set %ld %s", key, value);
+#ifdef debug
+	printf(" set %s, key = %ld, value = %s.\n", 
+									reply->str, key, value);
+#endif
+	if(strcmp(reply->str, "OK"))
+	{
+		printf(" set %s, key = %ld, value = %s.\n", 
+									reply->str, key, value);
+	}
     freeReplyObject(reply);
 }
