@@ -1,86 +1,46 @@
+/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., Beijing China - 2013.1.24 */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "node.h"
 
-/* Generation vnode from mac_node */
-int add_vnode(pnode *vnode, rb_node_t* root)
+int add_vnode(rb_node_t *root, pnode *mac_node)
 {
-	unsigned char id[1024];
-	unsigned char tmp[0xffff];
-	unsigned int i, key;
-    for (i = 0; i < vnum_max; i++)
-    {
-		sprintf(id, "%d", vnode->id);
+	int ret, i;
+    hash_key key;
+	unsigned char id[1023], tmp[15];
+	sprintf(id, "%d", mac_node->id);
+	for(i = 0; i < vns; i++)
+	{
 		sprintf(tmp, "%d", i);
-		strcat(id, tmp); 
-		
-        key = md5hash(id);
-		printf("ipv4 = %s\n", vnode->ipv4);
-        if((root = rb_insert(key, vnode->ipv4, root)))
-#ifdef debug
+		strcat(id, tmp);
+       	key = md5hash((void *)id);
+		printf("key = %u, ptr = %u, ", key, &key);
+      	if (rb_insert(key, mac_node->ipv4, root))
         {
-            printf("insert key[%ld], rbnode key[%ld] = value[%s] success!\n", 
-					key, root->key,  root->data);
-			return -1;
-        }
-        else
-#endif
-        {
-            printf("insert key[%ld] , error!\n", key, vnode->ipv4);
-        }
+           	printf("insert key[%u], %s success, ", 
+							key, mac_node->ipv4);
+			ret = 0;
+       	}
+       	else
+       	{
+           	printf("insert key[%ld] error!\n", key);
+			ret = -1;
+       	}
 	}
-	return 0;
-}
-
-/* update vnode */
-int update_vnode(unsigned int key, char *data, rb_node_t* root)
-{
-	int ret;
-	if(ret = rb_update(key, root, data))
-	{
-		printf("update key[%ld] to new data %s error!\n", key, data);
-		return -1;
-	}
-#ifdef debug
-	else
-	{
-		printf("update key[%ld] to new data %s success!\n", key, data);
-	}
-#endif
-	return 0;
-}
-
-/* search and delete */
-int search_vnode(unsigned int key, rb_node_t* root, rb_node_t* node)
-{
-	if ((node = rb_search(key, root)))
-#ifdef debug
-    {
-		printf("search key %ld success, data %s!\n", key, node->data);
-	}
-	else
-#endif
-	{
-        printf("search key %ld no data!\n", key);
-		return -1;
-    }
-	return 0;
-}
-
-/* delete vnode */
-int delete_vnode(unsigned int key, rb_node_t* root, rb_node_t* node)
-{
-	if ((root = rb_delete(key, root)))
-#ifdef debug
-    {
-        printf("delete key %ld , data %s success\n", key, root->data);
-    }
-    else
-#endif
-    {
-        printf("delete key %ld error\n", key);
-		return -1;
-    }
-	return 0;
+	return ret;
 }

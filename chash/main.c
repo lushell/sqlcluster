@@ -25,7 +25,11 @@ int vnodes = 0;
 /*****************************************************************/
 int main(int argc, char *argv[])
 {
-    int i, count = atoi(argv[1]);
+	if(argc <= 1)
+	{
+		exit(0);
+	}
+    int i, j, count = atoi(argv[1]);
 	if(count > nodes + 0xfff || count < 0)
 	{
 		printf("stdin error\n");
@@ -47,31 +51,23 @@ int main(int argc, char *argv[])
 
     rb_node_t* root = NULL, *node = NULL;
     hash_key key;
-	unsigned char id[16];
+	unsigned char id[1024], tmp[16];
 /* add node */
 	printf("******************addition*********************\n");
     for (i = 0; i < count; i++)
     {
-		sprintf(id, "%d", mac_node[i].id);
-        key = md5hash((void *)id);
-        if ((root = rb_insert(key, mac_node[i].ipv4, root)))
-        {
-            printf("insert key[%ld], %s success!\n", 
-					key, mac_node[i].ipv4);
-			vnodes++;
-        }
-        else
-        {
-            printf("insert key[%ld] error!\n", key);
-        }
+		if(add_vnode(root, &mac_node[i]))
+		{
+			exit(0);
+		}
 	}
 
 	printf("rbtree data node sum = %d\n", vnodes);
 /* update node */
 	printf("******************update*********************\n");
-	sprintf(id, "%d", mac_node[0].id);
+	sprintf(id, "%d", 10);
 	key = md5hash((void *)id);
-	char c[] = "www.360buy.com", ret;
+	char c[] = "www.google.com", ret;
 	if(ret = rb_update(key, root, c))
 	{
 		printf("update key[%ld] to new data %s error!\n", key, c);
@@ -84,16 +80,22 @@ int main(int argc, char *argv[])
 /* search and delete */
     for (i = 0; i < count; i++)
     {
+			
 		sprintf(id, "%d", mac_node[i].id);
-        key = md5hash((void *)id);
-        if ((node = rb_search(key, root)))
-        {
-            printf("search key %ld success, data %s!\n", node->key, node->data);
-        }
-        else
-        {
-            printf("search key %ld->%s!\n", key, node);
-        }
+		for(j = 0; j < vns; j++)
+		{
+			sprintf(tmp, "%d", j);
+			strcat(id, tmp);
+        	key = md5hash((void *)id);
+        	if ((node = rb_search(key, root)))
+        	{
+            	printf("search key %ld success, data %s!\n", node->key, node->data);
+        	}
+        	else
+        	{
+            	printf("search key %ld->%s!\n", key, node);
+        	}
+		}
 	}
 
 	printf("******************delete*********************\n");

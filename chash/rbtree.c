@@ -272,6 +272,7 @@ rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root)
     rb_node_t *parent = NULL, *node;
     parent = NULL;
 
+	printf(" ptr = %u, ", &key);
     if ((node = rb_search_auxiliary(key, root, &parent)))
     {
         return root;
@@ -282,6 +283,7 @@ rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root)
     node->left = node->right = NULL;
     node->color = RED;
 
+	printf(" node->key = %u, %u, ptr = %u, ", node->key, &node->key, &key);
     if (parent)
     {
         if (parent->key > key)
@@ -297,6 +299,7 @@ rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root)
     {
         root = node;
     }
+	printf("ptr = %u, ", &key);
     return rb_insert_rebalance(node, root);
 }
 
@@ -446,10 +449,9 @@ static hash_key rb_update_auxiliary(hash_key key, rb_node_t* root,  data_t data,
         else
         {
             node->data = data;
-			return ret;
+			return 0;
         }
     }
-
     if (save)
     {
         *save = parent;
@@ -457,7 +459,7 @@ static hash_key rb_update_auxiliary(hash_key key, rb_node_t* root,  data_t data,
     return -1;
 }
 
-hash_key rb_update(hash_key key, rb_node_t* root,  data_t data)
+int rb_update(hash_key key, rb_node_t* root,  data_t data)
 {
 	return rb_update_auxiliary(key, root, data, NULL);
 }
