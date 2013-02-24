@@ -18,27 +18,39 @@
 #include <stdlib.h>
 #include "node.h"
 
-int add_vnode(rb_node_t *root, pnode *mac_node)
+int generate_vkey(pnode *mac_node)
 {
-	int ret, i;
-    hash_key key;
+	int i;
+	hash_key vkey;
 	unsigned char id[1023], tmp[15];
-	sprintf(id, "%d", mac_node->id);
+	sprintf(id, "%u", mac_node->id);
 	for(i = 0; i < vns; i++)
 	{
-		sprintf(tmp, "%d", i);
+		sprintf(tmp, "%u", i);
 		strcat(id, tmp);
-       	key = md5hash((void *)id);
-		printf("key = %u, ptr = %u, ", key, &key);
-      	if (rb_insert(key, mac_node->ipv4, root))
+		vkey = md5hash((void *)id);
+		mac_node->vkey[i] = vkey;
+	}
+	return 0;
+}
+
+int add_vnode(rb_node_t *root, pnode *mac_node)
+{
+	rb_node_t *node = NULL;
+	int ret, i;
+	for(i = 0; i < vns; i++)
+	{
+      	if (rb_insert(mac_node->vkey[i], mac_node->ipv4, root))
         {
-           	printf("insert key[%u], %s success, ", 
-							key, mac_node->ipv4);
+           	printf("rbtree insert vkey[%u], %s success.\n", 
+							mac_node->vkey[i], mac_node->ipv4);
+			node = rb_search(mac_node->vkey[i], root);
+			printf("search result %u\t%s.\n", node->key, node->data);
 			ret = 0;
        	}
        	else
        	{
-           	printf("insert key[%ld] error!\n", key);
+           	printf("rbtree insert vkey[%u] error.\n", mac_node->vkey[i]);
 			ret = -1;
        	}
 	}

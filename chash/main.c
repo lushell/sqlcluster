@@ -1,4 +1,4 @@
-/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. All rights reserved.
+/* Copyright (c) 2000, 2011, tangchao.home@gmail.com and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,6 +47,24 @@ int main(int argc, char *argv[])
 		"***********************************************************\n"
 		"**********************Init success*************************\n"
 		"***********************************************************\n\n");
+
+	for(i = 0; i < count; i++)
+	{
+		generate_vkey(&mac_node[i]);
+		printf("generate vkey for %d.\n", mac_node[i].id);
+	}
+	for(i = 0; i < count; i++)
+	{
+		printf("node\t%u\t%s:\n", mac_node[i].id, mac_node[i].ipv4);
+		for(j = 0; j < vns; j++)
+		{
+			printf("vkey\t%u\t%s.\n", mac_node[i].vkey[j], mac_node[i].ipv4);
+		}
+	}
+	printf(
+		"***********************************************************\n"
+		"******************Generate vkey success********************\n"
+		"***********************************************************\n\n");
 	
 
     rb_node_t* root = NULL, *node = NULL;
@@ -54,11 +72,20 @@ int main(int argc, char *argv[])
 	unsigned char id[1024], tmp[16];
 /* add node */
 	printf("******************addition*********************\n");
-    for (i = 0; i < count; i++)
-    {
-		if(add_vnode(root, &mac_node[i]))
+
+	for(i = 0; i < count; i++)
+	{
+		printf("insert %u:\n", mac_node[i].id);
+		for(j = 0; j < vns; j++)
 		{
-			exit(0);
+			if(rb_insert(mac_node[i].vkey[j], mac_node[i].ipv4, root))
+			{
+				printf("%u\t%s.\n", mac_node[i].vkey[j], mac_node[i].ipv4);
+				node = rb_search((hash_key)mac_node[i].vkey[j], root);
+				if(node != NULL)
+				printf("search %u\t%s.\n", node->key, node->data);
+				vnodes++;
+			}
 		}
 	}
 
@@ -81,10 +108,10 @@ int main(int argc, char *argv[])
     for (i = 0; i < count; i++)
     {
 			
-		sprintf(id, "%d", mac_node[i].id);
+		sprintf(id, "%u", mac_node[i].id);
 		for(j = 0; j < vns; j++)
 		{
-			sprintf(tmp, "%d", j);
+			sprintf(tmp, "%u", j);
 			strcat(id, tmp);
         	key = md5hash((void *)id);
         	if ((node = rb_search(key, root)))

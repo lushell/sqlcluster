@@ -77,7 +77,6 @@ static rb_node_t* rb_rotate_right(rb_node_t* node, rb_node_t* root)
 
 static rb_node_t* rb_insert_rebalance(rb_node_t *node, rb_node_t *root)
 {
-
     rb_node_t *parent, *gparent, *uncle, *tmp;
 
     while ((parent = node->parent) && parent->color == RED)
@@ -272,7 +271,6 @@ rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root)
     rb_node_t *parent = NULL, *node;
     parent = NULL;
 
-	printf(" ptr = %u, ", &key);
     if ((node = rb_search_auxiliary(key, root, &parent)))
     {
         return root;
@@ -283,7 +281,6 @@ rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root)
     node->left = node->right = NULL;
     node->color = RED;
 
-	printf(" node->key = %u, %u, ptr = %u, ", node->key, &node->key, &key);
     if (parent)
     {
         if (parent->key > key)
@@ -299,7 +296,6 @@ rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root)
     {
         root = node;
     }
-	printf("ptr = %u, ", &key);
     return rb_insert_rebalance(node, root);
 }
 
