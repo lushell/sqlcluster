@@ -27,17 +27,12 @@ int vnodes = 0;
 /*****************************************************************/
 int main(int argc, char *argv[])
 {
-<<<<<<< HEAD
-    int i, ret, count = atoi(argv[1]) - 1;
-	if(count > max_nodes || count < 0)
-=======
 	if(argc <= 1)
 	{
 		exit(0);
 	}
     int i, j, count = atoi(argv[1]);
 	if(count > nodes + 0xfff || count < 0)
->>>>>>> 6db37952fadc9ab313299bfc85fbd431eef46c10
 	{
 		printf("stdin error\n");
 		exit(0);
@@ -54,9 +49,6 @@ int main(int argc, char *argv[])
 		printf("init node\t%d\t%s.\n", mac_node[i].id, mac_node[i].ipv4);
 	}
 	printf(
-<<<<<<< HEAD
-		"**********************Init success*************************\n");
-=======
 		"***********************************************************\n"
 		"**********************Init success*************************\n"
 		"***********************************************************\n\n");
@@ -78,36 +70,10 @@ int main(int argc, char *argv[])
 		"***********************************************************\n"
 		"******************Generate vkey success********************\n"
 		"***********************************************************\n\n");
->>>>>>> 6db37952fadc9ab313299bfc85fbd431eef46c10
 	
 
     rb_node_t* root = NULL, *node = NULL;	/* Init rbtree */
     hash_key key;
-<<<<<<< HEAD
-	unsigned char id[1024];
-/* add node */
-    for (i = 0; i <= count; i++)
-    {
-        ret = add_vnode(&mac_node[i], root, vnum_max);
-		if(ret != 0)
-        {
-            printf("insert error %lld %d!\n", mac_node[i].id, ret);
-        }
-	}
-
-/* search */
-	unsigned char tmp[0xf];
-	int j;
-    for (i = 0; i <= count; i++)
-    {
-        sprintf(id, "%d", mac_node[i].id);
-		for(j = 0; j <= vnum_max; j++)
-		{
-        	if((strlen(tmp) + strlen(id)) > 1024)
-        	{
-            	printf("Too long.\n");
-      	    }        
-=======
 	unsigned char id[1024], tmp[16];
 /* add node */
 	printf("******************addition*********************\n");
@@ -163,21 +129,6 @@ int main(int argc, char *argv[])
         	}
 		}
 	}
->>>>>>> 6db37952fadc9ab313299bfc85fbd431eef46c10
 
-			sprintf(tmp, "%d", j);
-     	    strcat(id, tmp);
-			printf("id = %s\n", id);
-    	    key = md5hash((void *)id);
-	        if ((node = rb_search(key, root)))
-	        {
-	            printf("search key %ld->%s!\n", node->key, node->data);
-	        }
-	        else
-	        {
-	           	printf("search key %ld->%s!\n", key, node);
-       		}
-		}
-	}
     return 0;
 }

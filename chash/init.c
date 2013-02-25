@@ -26,7 +26,7 @@ int my_init(pnode *node)
 	FILE *fp = fopen("/home/sqlcluster/sqlcluster/chash/stdin.txt","r");
 	int i = 0;
 	char buf[31];
-	while(i <= max_nodes)
+	while(i <= max_node)
 	{
 		if(fgets(buf, 31, fp))
 		{

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-typedef unsigned long int hash_key;
-=======
 typedef unsigned int hash_key;
->>>>>>> 6db37952fadc9ab313299bfc85fbd431eef46c10
 typedef char * data_t;
 
 typedef enum color_t
