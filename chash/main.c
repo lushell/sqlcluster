@@ -20,13 +20,15 @@
 #include "init.h"
 #include "node.h"
 
-/* If you need to modify vnodes in multi-event, and suggest it is use lock. */
+/* If you need to modify vnodes in multi-event, 
+and suggest it is use lock. */
 int vnodes = 0;
+
 /*****************************************************************/
 int main(int argc, char *argv[])
 {
-    int i, count = atoi(argv[1]);
-	if(count > nodes + 0xfff || count < 0)
+    int i, ret, count = atoi(argv[1]) - 1;
+	if(count > max_nodes || count < 0)
 	{
 		printf("stdin error\n");
 		exit(0);
@@ -35,82 +37,56 @@ int main(int argc, char *argv[])
 /* Init node */
 	pnode mac_node[nodes + 0xffff];
 	my_init(mac_node);
-	for(i = 0; i < count; i++)
+	printf(
+		"**********************Init starting************************\n");
+	
+	for(i = 0; i <= count; i++)
 	{
 		printf("init node\t%d\t%s.\n", mac_node[i].id, mac_node[i].ipv4);
 	}
 	printf(
-		"***********************************************************\n"
-		"**********************Init success*************************\n"
-		"***********************************************************\n\n");
+		"**********************Init success*************************\n");
 	
 
-    rb_node_t* root = NULL, *node = NULL;
+    rb_node_t* root = NULL, *node = NULL;	/* Init rbtree */
     hash_key key;
-	unsigned char id[16];
+	unsigned char id[1024];
 /* add node */
-	printf("******************addition*********************\n");
-    for (i = 0; i < count; i++)
+    for (i = 0; i <= count; i++)
     {
-		sprintf(id, "%d", mac_node[i].id);
-        key = md5hash((void *)id);
-        if ((root = rb_insert(key, mac_node[i].ipv4, root)))
+        ret = add_vnode(&mac_node[i], root, vnum_max);
+		if(ret != 0)
         {
-            printf("insert key[%ld], %s success!\n", 
-					key, mac_node[i].ipv4);
-			vnodes++;
-        }
-        else
-        {
-            printf("insert key[%ld] error!\n", key);
+            printf("insert error %lld %d!\n", mac_node[i].id, ret);
         }
 	}
 
-	printf("rbtree data node sum = %d\n", vnodes);
-/* update node */
-	printf("******************update*********************\n");
-	sprintf(id, "%d", mac_node[0].id);
-	key = md5hash((void *)id);
-	char c[] = "www.360buy.com", ret;
-	if(ret = rb_update(key, root, c))
-	{
-		printf("update key[%ld] to new data %s error!\n", key, c);
-	}
-	else
-	{
-		printf("update key[%ld] to new data %s success!\n", key, c);
-	}
-	printf("******************search*********************\n");
-/* search and delete */
-    for (i = 0; i < count; i++)
+/* search */
+	unsigned char tmp[0xf];
+	int j;
+    for (i = 0; i <= count; i++)
     {
-		sprintf(id, "%d", mac_node[i].id);
-        key = md5hash((void *)id);
-        if ((node = rb_search(key, root)))
-        {
-            printf("search key %ld success, data %s!\n", node->key, node->data);
-        }
-        else
-        {
-            printf("search key %ld->%s!\n", key, node);
-        }
-	}
+        sprintf(id, "%d", mac_node[i].id);
+		for(j = 0; j <= vnum_max; j++)
+		{
+        	if((strlen(tmp) + strlen(id)) > 1024)
+        	{
+            	printf("Too long.\n");
+      	    }        
 
-	printf("******************delete*********************\n");
-	for(i = 0; i < count; i++)
-	{
-		sprintf(id, "%d", mac_node[i].id);
-        key = md5hash((void *)id);
-        if ((root = rb_delete(key, root)))
-        {
-            printf("delete key %ld success\n", key);
-			vnodes--;
-        }
-        else
-        {
-            printf("delete key %ld->%s\n", key, root);
-        }
-    }
-	printf("rbtree data node sum = %d\n", vnodes);
+			sprintf(tmp, "%d", j);
+     	    strcat(id, tmp);
+			printf("id = %s\n", id);
+    	    key = md5hash((void *)id);
+	        if ((node = rb_search(key, root)))
+	        {
+	            printf("search key %ld->%s!\n", node->key, node->data);
+	        }
+	        else
+	        {
+	           	printf("search key %ld->%s!\n", key, node);
+       		}
+		}
+	}
     return 0;
 }

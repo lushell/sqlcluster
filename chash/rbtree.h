@@ -1,4 +1,4 @@
-typedef long int hash_key;
+typedef unsigned long int hash_key;
 typedef char * data_t;
 
 typedef enum color_t

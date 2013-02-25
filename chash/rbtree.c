@@ -259,7 +259,7 @@ static rb_node_t* rb_search_auxiliary(hash_key key, rb_node_t* root, rb_node_t**
         }
     }
 
-    if (save)
+    if(save)
     {
         *save = parent;
     }
@@ -274,6 +274,7 @@ rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root)
 
     if ((node = rb_search_auxiliary(key, root, &parent)))
     {
+		printf("node exist.\n");
         return root;
     }
 

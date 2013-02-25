@@ -4,83 +4,53 @@
 #include "node.h"
 
 /* Generation vnode from mac_node */
-int add_vnode(pnode *vnode, rb_node_t* root)
+int add_vnode(pnode *vnode, rb_node_t* rbtree, int vnum)
 {
-	unsigned char id[1024];
-	unsigned char tmp[0xffff];
-	unsigned int i, key;
-    for (i = 0; i < vnum_max; i++)
-    {
-		sprintf(id, "%d", vnode->id);
-		sprintf(tmp, "%d", i);
-		strcat(id, tmp); 
-		
-        key = md5hash(id);
-		printf("ipv4 = %s\n", vnode->ipv4);
-        if((root = rb_insert(key, vnode->ipv4, root)))
-#ifdef debug
-        {
-            printf("insert key[%ld], rbnode key[%ld] = value[%s] success!\n", 
-					key, root->key,  root->data);
-			return -1;
-        }
-        else
-#endif
-        {
-            printf("insert key[%ld] , error!\n", key, vnode->ipv4);
-        }
-	}
-	return 0;
-}
-
-/* update vnode */
-int update_vnode(unsigned int key, char *data, rb_node_t* root)
-{
+	unsigned long int key;
 	int ret;
-	if(ret = rb_update(key, root, data))
+	unsigned char id[1024];
+	rb_node_t *root;
+	sprintf(id, "%d", vnode->id);
+	if(vnum <= 1)
 	{
-		printf("update key[%ld] to new data %s error!\n", key, data);
-		return -1;
+		key = md5hash((void *)id);
+		if(root = rb_insert(key, vnode->ipv4, rbtree))
+		{
+			ret = 0;
+		}	
+		else
+		{
+			ret = -1;
+		}
 	}
-#ifdef debug
-	else
+	else if(vnum > 1)
 	{
-		printf("update key[%ld] to new data %s success!\n", key, data);
+		unsigned char tmp[0xf];
+		unsigned int i;
+    	for (i = 0; i < vnum_max + 1; i++)
+    	{
+			if((strlen(tmp) + strlen(id)) > 1024)
+			{
+				printf("Too long.\n");
+				ret = -1;
+				exit(ret);
+			}
+			sprintf(tmp, "%d", i);
+			strcat(id, tmp); 
+        	key = md5hash((void *)id);
+        	if((root = rb_insert(key, vnode->ipv4, rbtree)))
+			{
+				ret = 0;
+        	}
+        	else
+			{
+				ret = -1;
+    	    }
+		}
 	}
-#endif
-	return 0;
-}
-
-/* search and delete */
-int search_vnode(unsigned int key, rb_node_t* root, rb_node_t* node)
-{
-	if ((node = rb_search(key, root)))
-#ifdef debug
-    {
-		printf("search key %ld success, data %s!\n", key, node->data);
-	}
-	else
-#endif
+	else if(vnum < 0)
 	{
-        printf("search key %ld no data!\n", key);
-		return -1;
-    }
-	return 0;
-}
-
-/* delete vnode */
-int delete_vnode(unsigned int key, rb_node_t* root, rb_node_t* node)
-{
-	if ((root = rb_delete(key, root)))
-#ifdef debug
-    {
-        printf("delete key %ld , data %s success\n", key, root->data);
-    }
-    else
-#endif
-    {
-        printf("delete key %ld error\n", key);
-		return -1;
-    }
-	return 0;
+		ret = -1;
+	}
+	return ret;
 }

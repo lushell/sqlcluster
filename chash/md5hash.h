@@ -1,1 +1,1 @@
-long md5hash(void *data);
+unsigned long md5hash(void *data);
