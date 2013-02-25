@@ -1,4 +1,4 @@
-/* Copyright (c) 2000, 2011, tangchao@360buy.com and/or its affiliates. All rights reserved.
+/* Copyright (c) 2000, 2011, tangchao.home@gmail.com and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,8 +27,17 @@ int vnodes = 0;
 /*****************************************************************/
 int main(int argc, char *argv[])
 {
+<<<<<<< HEAD
     int i, ret, count = atoi(argv[1]) - 1;
 	if(count > max_nodes || count < 0)
+=======
+	if(argc <= 1)
+	{
+		exit(0);
+	}
+    int i, j, count = atoi(argv[1]);
+	if(count > nodes + 0xfff || count < 0)
+>>>>>>> 6db37952fadc9ab313299bfc85fbd431eef46c10
 	{
 		printf("stdin error\n");
 		exit(0);
@@ -45,11 +54,36 @@ int main(int argc, char *argv[])
 		printf("init node\t%d\t%s.\n", mac_node[i].id, mac_node[i].ipv4);
 	}
 	printf(
+<<<<<<< HEAD
 		"**********************Init success*************************\n");
+=======
+		"***********************************************************\n"
+		"**********************Init success*************************\n"
+		"***********************************************************\n\n");
+
+	for(i = 0; i < count; i++)
+	{
+		generate_vkey(&mac_node[i]);
+		printf("generate vkey for %d.\n", mac_node[i].id);
+	}
+	for(i = 0; i < count; i++)
+	{
+		printf("node\t%u\t%s:\n", mac_node[i].id, mac_node[i].ipv4);
+		for(j = 0; j < vns; j++)
+		{
+			printf("vkey\t%u\t%s.\n", mac_node[i].vkey[j], mac_node[i].ipv4);
+		}
+	}
+	printf(
+		"***********************************************************\n"
+		"******************Generate vkey success********************\n"
+		"***********************************************************\n\n");
+>>>>>>> 6db37952fadc9ab313299bfc85fbd431eef46c10
 	
 
     rb_node_t* root = NULL, *node = NULL;	/* Init rbtree */
     hash_key key;
+<<<<<<< HEAD
 	unsigned char id[1024];
 /* add node */
     for (i = 0; i <= count; i++)
@@ -73,6 +107,63 @@ int main(int argc, char *argv[])
         	{
             	printf("Too long.\n");
       	    }        
+=======
+	unsigned char id[1024], tmp[16];
+/* add node */
+	printf("******************addition*********************\n");
+
+	for(i = 0; i < count; i++)
+	{
+		printf("insert %u:\n", mac_node[i].id);
+		for(j = 0; j < vns; j++)
+		{
+			if(rb_insert(mac_node[i].vkey[j], mac_node[i].ipv4, root))
+			{
+				printf("%u\t%s.\n", mac_node[i].vkey[j], mac_node[i].ipv4);
+				node = rb_search((hash_key)mac_node[i].vkey[j], root);
+				if(node != NULL)
+				printf("search %u\t%s.\n", node->key, node->data);
+				vnodes++;
+			}
+		}
+	}
+
+	printf("rbtree data node sum = %d\n", vnodes);
+/* update node */
+	printf("******************update*********************\n");
+	sprintf(id, "%d", 10);
+	key = md5hash((void *)id);
+	char c[] = "www.google.com", ret;
+	if(ret = rb_update(key, root, c))
+	{
+		printf("update key[%ld] to new data %s error!\n", key, c);
+	}
+	else
+	{
+		printf("update key[%ld] to new data %s success!\n", key, c);
+	}
+	printf("******************search*********************\n");
+/* search and delete */
+    for (i = 0; i < count; i++)
+    {
+			
+		sprintf(id, "%u", mac_node[i].id);
+		for(j = 0; j < vns; j++)
+		{
+			sprintf(tmp, "%u", j);
+			strcat(id, tmp);
+        	key = md5hash((void *)id);
+        	if ((node = rb_search(key, root)))
+        	{
+            	printf("search key %ld success, data %s!\n", node->key, node->data);
+        	}
+        	else
+        	{
+            	printf("search key %ld->%s!\n", key, node);
+        	}
+		}
+	}
+>>>>>>> 6db37952fadc9ab313299bfc85fbd431eef46c10
 
 			sprintf(tmp, "%d", j);
      	    strcat(id, tmp);

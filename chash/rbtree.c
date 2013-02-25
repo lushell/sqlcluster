@@ -77,7 +77,6 @@ static rb_node_t* rb_rotate_right(rb_node_t* node, rb_node_t* root)
 
 static rb_node_t* rb_insert_rebalance(rb_node_t *node, rb_node_t *root)
 {
-
     rb_node_t *parent, *gparent, *uncle, *tmp;
 
     while ((parent = node->parent) && parent->color == RED)
@@ -447,10 +446,9 @@ static hash_key rb_update_auxiliary(hash_key key, rb_node_t* root,  data_t data,
         else
         {
             node->data = data;
-			return ret;
+			return 0;
         }
     }
-
     if (save)
     {
         *save = parent;
@@ -458,7 +456,7 @@ static hash_key rb_update_auxiliary(hash_key key, rb_node_t* root,  data_t data,
     return -1;
 }
 
-hash_key rb_update(hash_key key, rb_node_t* root,  data_t data)
+int rb_update(hash_key key, rb_node_t* root,  data_t data)
 {
 	return rb_update_auxiliary(key, root, data, NULL);
 }

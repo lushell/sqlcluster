@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 typedef unsigned long int hash_key;
+=======
+typedef unsigned int hash_key;
+>>>>>>> 6db37952fadc9ab313299bfc85fbd431eef46c10
 typedef char * data_t;
 
 typedef enum color_t
@@ -18,4 +22,4 @@ typedef struct rb_node_t
 rb_node_t* rb_insert(hash_key key, data_t data, rb_node_t* root);
 rb_node_t* rb_search(hash_key key, rb_node_t* root);
 rb_node_t* rb_delete(hash_key key, rb_node_t* root);
-hash_key rb_update(hash_key key, rb_node_t* root, data_t data);
+int rb_update(hash_key key, rb_node_t* root, data_t data);
